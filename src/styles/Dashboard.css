@@ -1,0 +1,140 @@
+/* Dashboard Background */
+
+.dashboard {
+  min-height: 100vh;
+  padding: 30px;
+  background: linear-gradient(135deg,#51b166,#2a5298);
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+/* Cards */
+
+.cards{
+  display:flex;
+  gap:20px;
+  margin-bottom:30px;
+}
+
+.card{
+  background: rgba(255,255,255,0.15);
+  padding:20px;
+  border-radius:12px;
+  width:200px;
+  text-align:center;
+  backdrop-filter: blur(5px);
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:scale(1.05);
+}
+
+/* LOW STOCK SECTION */
+
+.lowStock{
+  background: rgba(255,255,255,0.12);
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:30px;
+}
+
+/* WARNING TITLE */
+
+.warningTitle{
+  color:#f70000;
+  font-weight:bold;
+}
+
+/* LOW STOCK ITEM */
+
+.lowItem{
+  color:#ee0000;
+  font-weight:bold;
+  margin:6px 0;
+  font-size:18px;
+}
+
+/* BLINK ANIMATION */
+
+.blink{
+  animation: blinkAnimation 1s infinite;
+}
+
+@keyframes blinkAnimation{
+  0%{opacity:1;}
+  50%{opacity:0.3;}
+  100%{opacity:1;}
+}
+
+/* SEARCH BOX */
+
+.searchBox{
+  background: rgba(255,255,255,0.12);
+  padding:20px;
+  border-radius:12px;
+}
+
+.searchBox input{
+  padding:8px;
+  border-radius:6px;
+  border:none;
+  margin-right:10px;
+}
+
+.searchBox button{
+  padding:8px 14px;
+  border-radius:6px;
+  border:none;
+  cursor:pointer;
+}
+
+/* SEARCH RESULT */
+
+.result{
+  margin-top:20px;
+  padding:15px;
+  border-radius:10px;
+  background: rgba(255,255,255,0.12);
+}
+
+/* BACK BUTTON */
+
+.backBtn{
+  background:white;
+  border:none;
+  padding:8px 15px;
+  border-radius:6px;
+  cursor:pointer;
+  margin-bottom:15px;
+  Color:Black;
+}
+
+.backBtn:hover{
+  background:#ddd;
+}
+.menu-page{
+  text-align:center;
+  margin-top:80px;
+}
+
+.menu-buttons{
+  margin-top:40px;
+  display:flex;
+  justify-content:center;
+  gap:20px;
+}
+
+.menu-buttons button{
+  padding:12px 25px;
+  border:none;
+  border-radius:8px;
+  background:#3498db;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.menu-buttons button:hover{
+  background:#2980b9;
+}

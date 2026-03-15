@@ -1,24 +1,64 @@
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import Dashboard from "./pages/Dashboard";
+import ItemsEntry from "./pages/ItemsEntry";
+import DailyEntry from "./pages/DailyEntry";
+import Reports from "./pages/Reports";
 
 function App() {
+
+  const [items, setItems] = useState([]);
+  const [entries, setEntries] = useState([]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+    <BrowserRouter>
+
+      <Routes>
+
+        <Route path="/" element={<LoginPage />} />
+
+        <Route path="/home" element={<HomePage />} />
+
+        <Route 
+          path="/dashboard" 
+          element={<Dashboard items={items} entries={entries} />} 
+        />
+
+        <Route 
+          path="/items-entry" 
+          element={<ItemsEntry items={items} setItems={setItems} />} 
+        />
+
+        <Route 
+          path="/daily-entry" 
+          element={
+            <DailyEntry 
+              items={items} 
+              entries={entries} 
+              setEntries={setEntries} 
+            />
+          } 
+        />
+
+        <Route 
+          path="/reports" 
+          element={<Reports entries={entries} />} 
+        />
+
+      </Routes>
+
+      {/* Toast Notification System */}
+      <ToastContainer position="top-right" autoClose={2000} />
+
+    </BrowserRouter>
+
   );
 }
 
