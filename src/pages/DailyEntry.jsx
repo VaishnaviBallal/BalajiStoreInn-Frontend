@@ -19,8 +19,8 @@ function DailyEntry() {
   const [editId, setEditId] = useState(null);
   const [price, setPrice] = useState("");
 
-  const ENTRY_API = "http://localhost:8080/entries";
-  const ITEM_API = "http://localhost:8080/products";
+  const ENTRY_API = "https://balajirestaurant.onrender.com/entries";
+  const ITEM_API = "https://balajirestaurant.onrender.com/products";
 
   
   // Load entries + items

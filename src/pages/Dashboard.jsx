@@ -9,7 +9,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   // Function to load products 
   const loadProducts = () => { 
-    fetch("http://localhost:8080/products") 
+    fetch("https://balajirestaurant.onrender.com/products") 
     .then((res) => res.json()) 
     .then((data) => { 
       setItems(data); }) 

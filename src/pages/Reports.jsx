@@ -25,7 +25,7 @@ const Reports = () => {
     try {
 
       const response = await axios.get(
-  `http://localhost:8080/reports/items?start=${startDate}&end=${endDate}`
+  `https://balajirestaurant.onrender.com/reports/items?start=${startDate}&end=${endDate}`
 );
 
       if (Array.isArray(response.data)) {
@@ -66,7 +66,7 @@ const Reports = () => {
     toast.success("Downloading PDF...");
 
     window.open(
-  `http://localhost:8080/reports/items/pdf?start=${startDate}&end=${endDate}`
+  `https://balajirestaurant.onrender.com/reports/items/pdf?start=${startDate}&end=${endDate}`
 );
 
   };
