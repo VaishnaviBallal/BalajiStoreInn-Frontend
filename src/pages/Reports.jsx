@@ -25,8 +25,8 @@ const Reports = () => {
     try {
 
       const response = await axios.get(
-        `http://localhost:8080/reports/items?start=${startDate}&end=${endDate}`
-      );
+  `http://localhost:8080/reports/items?start=${startDate}&end=${endDate}`
+);
 
       if (Array.isArray(response.data)) {
 
@@ -66,8 +66,8 @@ const Reports = () => {
     toast.success("Downloading PDF...");
 
     window.open(
-      `http://localhost:8080/reports/items/pdf?start=${startDate}&end=${endDate}`
-    );
+  `http://localhost:8080/reports/items/pdf?start=${startDate}&end=${endDate}`
+);
 
   };
 
@@ -128,6 +128,9 @@ const Reports = () => {
               <th>Purchased</th>
               <th>Used</th>
               <th>Closing</th>
+              <th>Purchase ₹</th>
+<th>Usage ₹</th>
+<th>Stock Value ₹</th>
             </tr>
           </thead>
 
@@ -141,6 +144,9 @@ const Reports = () => {
                 <td>{item.purchased}</td>
                 <td>{item.used}</td>
                 <td>{item.closingStock}</td>
+                <td>{item.purchaseAmount}</td>
+<td>{item.usageAmount}</td>
+<td>{item.stockValue}</td>
               </tr>
 
             ))}

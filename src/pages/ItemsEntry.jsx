@@ -9,10 +9,11 @@ function ItemsEntry({ items, setItems }) {
   const [unit, setUnit] = useState("");
   const [qty, setQty] = useState("");
   const [editId, setEditId] = useState(null);
+  const [price, setPrice] = useState("");
 
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:8080/products";
+  const API_URL =  "http://localhost:8080/products";
 
   // Load items
   useEffect(() => {
@@ -31,17 +32,17 @@ function ItemsEntry({ items, setItems }) {
   // ADD OR UPDATE
   const addItem = () => {
 
-    if (itemName === "" || unit === "" || qty === "") {
-      showError("Please fill all fields");
-      return;
-    }
+   if (itemName === "" || unit === "" || qty === "" || price === "") {
+  showError("Please fill all fields");
+  return;
+}
 
-    const itemData = {
-      name: itemName,
-      unit: unit,
-      quantity: qty,
-      price: 0
-    };
+   const itemData = {
+  name: itemName,
+  unit: unit,
+  quantity: Number(qty),
+  price: Number(price)
+};
 
     if (editId) {
 
@@ -82,6 +83,7 @@ function ItemsEntry({ items, setItems }) {
     setItemName("");
     setUnit("");
     setQty("");
+    setPrice("");
 
   };
 
@@ -107,17 +109,15 @@ function ItemsEntry({ items, setItems }) {
   };
 
   // EDIT
-  const editItem = (item) => {
+ const editItem = (item) => {
+  setItemName(item.name);
+  setUnit(item.unit);
+  setQty(item.quantity);
+  setPrice(item.price); // ✅ ADD THIS
+  setEditId(item.id);
 
-    setItemName(item.name);
-    setUnit(item.unit);
-    setQty(item.quantity);
-    setEditId(item.id);
-
-    showInfo("Editing item");
-
-  };
-
+  showInfo("Editing item");
+};
   return (
 
     <div className="page">
@@ -159,6 +159,13 @@ function ItemsEntry({ items, setItems }) {
           onChange={(e) => setQty(e.target.value)}
         />
 
+        <input
+  type="number"
+  placeholder="Price per unit"
+  value={price}
+  onChange={(e) => setPrice(e.target.value)}
+/>
+
         <button className="button" onClick={addItem}>
           {editId ? "Update Item" : "Add Item"}
         </button>
@@ -177,6 +184,7 @@ function ItemsEntry({ items, setItems }) {
               <th>Item</th>
               <th>Unit</th>
               <th>Opening Qty</th>
+              <th>Price</th>
               <th>Edit</th>
               <th>Delete</th>
             </tr>
@@ -192,6 +200,7 @@ function ItemsEntry({ items, setItems }) {
                 <td>{item.name}</td>
                 <td>{item.unit}</td>
                 <td>{item.quantity}</td>
+                <td>{item.price}</td>
 
                 <td>
                   <button

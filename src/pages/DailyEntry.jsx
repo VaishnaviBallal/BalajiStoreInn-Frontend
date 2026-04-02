@@ -17,6 +17,7 @@ function DailyEntry() {
   const [type, setType] = useState("");
   const [qty, setQty] = useState("");
   const [editId, setEditId] = useState(null);
+  const [price, setPrice] = useState("");
 
   const ENTRY_API = "http://localhost:8080/entries";
   const ITEM_API = "http://localhost:8080/products";
@@ -65,16 +66,17 @@ function DailyEntry() {
   // Save entry
   const saveEntry = async () => {
 
-    if (!date || !item || !type || !qty) {
-      toast.warning("Please fill all fields");
-      return;
-    }
+  if (!date || !item || !type || !qty || (type === "purchase" && !price)) {
+  toast.warning("Please fill all fields");
+  return;
+}
 
-    const entry = {
-      itemName: item,
-      type: type,
-      quantity: Number(qty)
-    };
+   const entry = {
+  itemName: item,
+  type: type,
+  quantity: Number(qty),
+  price: type === "purchase" ? Number(price) : 0
+};
 
     try {
 
@@ -97,6 +99,7 @@ function DailyEntry() {
       setType("");
       setQty("");
       setEditId(null);
+      setPrice("");
 
     } catch (error) {
 
@@ -201,6 +204,15 @@ function DailyEntry() {
           onChange={(e) => setQty(e.target.value)}
         />
 
+        {type === "purchase" && (
+  <input
+    type="number"
+    placeholder="Price per unit"
+    value={price}
+    onChange={(e) => setPrice(e.target.value)}
+  />
+)}
+
         <button
           className="button"
           onClick={saveEntry}
@@ -223,6 +235,7 @@ function DailyEntry() {
               <th>Item</th>
               <th>Type</th>
               <th>Quantity</th>
+              <th>Price</th>
               <th>Edit</th>
               <th>Delete</th>
             </tr>
@@ -248,7 +261,7 @@ function DailyEntry() {
                 </td>
 
                 <td>{e.quantity}</td>
-
+<td>{e.price}</td>
                 <td>
                   <button
                     className="edit-btn"

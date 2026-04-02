@@ -1,247 +1,100 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import "../styles/Dashboard.css";
 import { useNavigate } from "react-router-dom";
-import { showSuccess, showError, showInfo } from "../utils/Toast";
 
-function DailyEntry({ items }) {
-
+export default function Dashboard() { 
+  const [items, setItems] = useState([]); 
+  const [search, setSearch] = useState(""); 
+  const [searchResult, setSearchResult] = useState(null);
   const navigate = useNavigate();
-
-  const [entries, setEntries] = useState([]);
-  const [date, setDate] = useState("");
-  const [item, setItem] = useState("");
-  const [type, setType] = useState("");
-  const [qty, setQty] = useState("");
-  const [editId, setEditId] = useState(null);
-
-  const API_URL = "http://localhost:8080/entries";
-
-  // Load entries
-  useEffect(() => {
-
-    axios.get(API_URL)
-      .then(res => setEntries(res.data))
-      .catch(err => {
-        console.error(err);
-        showError("Failed to load entries");
-      });
-
-  }, []);
-
-  const saveEntry = async () => {
-
-    if (!date || !item || !type || !qty) {
-      showError("Please fill all fields");
-      return;
-    }
-
-    const entry = {
-      itemName: item,
-      type: type,
-      quantity: Number(qty)
+  // Function to load products 
+  const loadProducts = () => { 
+    fetch("http://localhost:8080/products") 
+    .then((res) => res.json()) 
+    .then((data) => { 
+      setItems(data); }) 
+      .catch((err) => console.error(err)); 
     };
 
-    try {
+    // Load products on page load and refresh every 5 seconds 
+    useEffect(() => { 
+      loadProducts(); 
+      const interval = setInterval(() => { 
+        loadProducts(); 
+      }, 5000);
+       return () => clearInterval(interval);
+       }, []);
 
-      if (editId) {
+    // Search item 
+    const handleSearch = () => { 
+      const item = items.find( 
+        (i) => i.name.toLowerCase().includes(search.toLowerCase())
+       ); 
+       if (!item) { 
+        setSearchResult(null); 
+        alert("Item not found"); 
+        return;
+       } 
+       setSearchResult(item);
+       };
 
-        await axios.put(`${API_URL}/${editId}`, entry);
-        showSuccess("Entry updated successfully");
-
-      } else {
-
-        await axios.post(API_URL, entry);
-        showSuccess("Entry saved successfully");
-
-      }
-
-      const res = await axios.get(API_URL);
-      setEntries(res.data);
-
-      setDate("");
-      setItem("");
-      setType("");
-      setQty("");
-      setEditId(null);
-
-    } catch (error) {
-
-      console.error(error);
-      showError("Error saving entry");
-
-    }
-
-  };
-
-  // DELETE ENTRY
-  const deleteEntry = async (id) => {
-
-    if (!window.confirm("Are you sure you want to delete this entry?")) {
-      return;
-    }
-
-    try {
-
-      await axios.delete(`${API_URL}/${id}`);
-      setEntries(entries.filter(e => e.id !== id));
-
-      showSuccess("Entry deleted successfully");
-
-    } catch (error) {
-
-      console.error(error);
-      showError("Error deleting entry");
-
-    }
-
-  };
-
-  // EDIT ENTRY
-  const editEntry = (entry) => {
-
-    setItem(entry.itemName);
-    setType(entry.type);
-    setQty(entry.quantity);
-    setEditId(entry.id);
-
-    showInfo("Editing entry");
-
-  };
-
-  return (
-
-    <div className="page">
-
-      {/* Home Button */}
+       // Low stock filter 
+       const lowStockItems = items.filter((item) => item.quantity < 10); 
+       return ( 
+        
+       <div className="dashboard"> 
+        {/* Back Button */}
       <button
         className="backBtn"
         onClick={() => navigate("/home")}
       >
         🏠 Home
       </button>
+       <h1>Dashboard</h1> 
+       {/* Summary Cards */} 
+       <div className="cards"> 
+        <div className="card">
+         <h3>Total Items</h3> 
+         <p>{items.length}</p> 
+         </div>
+         <div className="card"> 
+          <h3>Low Stock Items</h3> 
+          <p>{lowStockItems.length}</p> 
+          </div> </div> 
+          {/* Low Stock Section */} 
+          <div className="lowStock"> 
+            <h2>⚠ Low Stock (Less than 10)</h2> 
+            {lowStockItems.length === 0 ? ( 
+              <p>No low stock items</p> 
+            ) : ( 
+            <ul> 
+              {lowStockItems.map((item) => (
+  <li key={item.id} className="lowItem"> 
+  {item.name.toUpperCase()} → {item.quantity} {item.unit} 
+  </li> 
+))} 
+</ul> 
+)}
+ </div> 
+ {/* Search Section */} 
+ <div className="searchBox"> 
+  <h2>Search Item Stock</h2> 
+  <input type="text"
+   placeholder="Enter item name" 
+   value={search} 
+   onChange={(e) => setSearch(e.target.value)} 
+   />
 
-      <h2>Daily Entry</h2>
-
-      <div className="form-box">
-
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-
-        <select
-          value={item}
-          onChange={(e) => setItem(e.target.value)}
-        >
-
-          <option value="">Select Item</option>
-
-          {items.map((i) => (
-
-            <option key={i.id} value={i.name}>
-              {i.name}
-            </option>
-
-          ))}
-
-        </select>
-
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-
-          <option value="">Select Type</option>
-          <option value="purchase">Purchase</option>
-          <option value="usage">Usage</option>
-
-        </select>
-
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={qty}
-          onChange={(e) => setQty(e.target.value)}
-        />
-
-        <button className="button" onClick={saveEntry}>
-          {editId ? "Update Entry" : "Save"}
-        </button>
-
-      </div>
-
-      <h3>Daily Records</h3>
-
-      <div className="table-container">
-
-        <table className="table">
-
-          <thead>
-
-            <tr>
-              <th>Date</th>
-              <th>Item</th>
-              <th>Type</th>
-              <th>Quantity</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {entries.map((e) => (
-
-              <tr key={e.id}>
-
-                <td>{e.entryTime}</td>
-
-                <td>{e.itemName}</td>
-
-                <td
-                  style={{
-                    color: e.type === "purchase" ? "green" : "red",
-                    fontWeight: "bold"
-                  }}
-                >
-                  {e.type}
-                </td>
-
-                <td>{e.quantity}</td>
-
-                <td>
-                  <button
-                    className="edit-btn"
-                    onClick={() => editEntry(e)}
-                  >
-                    Edit
-                  </button>
-                </td>
-
-                <td>
-                  <button
-                    className="delete-btn"
-                    onClick={() => deleteEntry(e.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  );
-}
-
-export default DailyEntry;
+  <button onClick={handleSearch}>Search</button> 
+  </div>
+   {/* Search Result */}
+    {searchResult && ( 
+      <div className="result"> 
+      <h3>{searchResult.name.toUpperCase()}</h3>
+       <p> 
+        Current Stock: {searchResult.quantity} {searchResult.unit} 
+      </p>
+       </div> )} 
+       </div> 
+       ); 
+       }
