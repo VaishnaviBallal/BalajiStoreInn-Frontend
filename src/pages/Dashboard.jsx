@@ -69,9 +69,12 @@ export default function Dashboard() {
             ) : ( 
             <ul> 
               {lowStockItems.map((item) => (
-  <li key={item.id} className="lowItem"> 
-  {item.name.toUpperCase()} → {item.quantity} {item.unit} 
-  </li> 
+  <li
+  key={item.id}
+  className={`lowItem ${item.quantity < 5 ? "blink" : ""}`}
+>
+  {item.name.toUpperCase()} → {item.quantity} {item.unit}
+</li>
 ))} 
 </ul> 
 )}

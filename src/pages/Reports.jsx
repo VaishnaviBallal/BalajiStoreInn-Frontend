@@ -13,6 +13,9 @@ const Reports = () => {
   const [reports, setReports] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const formatNumber = (value) => {
+  return value ? Number(value).toFixed(2) : "0.00";
+};
 
   // Fetch Report
   const fetchReport = async () => {
@@ -144,9 +147,9 @@ const Reports = () => {
                 <td>{item.purchased}</td>
                 <td>{item.used}</td>
                 <td>{item.closingStock}</td>
-                <td>{item.purchaseAmount}</td>
-<td>{item.usageAmount}</td>
-<td>{item.stockValue}</td>
+                <td>{formatNumber(item.purchaseAmount)}</td>
+<td>{formatNumber(item.usageAmount)}</td>
+<td>{formatNumber(item.stockValue)}</td>
               </tr>
 
             ))}
