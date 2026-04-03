@@ -10,6 +10,9 @@ function ItemsEntry({ items, setItems }) {
   const [qty, setQty] = useState("");
   const [editId, setEditId] = useState(null);
   const [price, setPrice] = useState("");
+  const formatPrice = (value) => {
+  return value ? Number(value).toFixed(2) : "0.00";
+};
 
   const navigate = useNavigate();
 
@@ -113,7 +116,7 @@ function ItemsEntry({ items, setItems }) {
   setItemName(item.name);
   setUnit(item.unit);
   setQty(item.quantity);
-  setPrice(item.price); // ✅ ADD THIS
+ setPrice(Number(item.price).toFixed(2));
   setEditId(item.id);
 
   showInfo("Editing item");
@@ -200,7 +203,7 @@ function ItemsEntry({ items, setItems }) {
                 <td>{item.name}</td>
                 <td>{item.unit}</td>
                 <td>{item.quantity}</td>
-                <td>{item.price}</td>
+                <td>{formatPrice(item.price)}</td>
 
                 <td>
                   <button

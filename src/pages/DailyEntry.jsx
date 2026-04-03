@@ -18,6 +18,9 @@ function DailyEntry() {
   const [qty, setQty] = useState("");
   const [editId, setEditId] = useState(null);
   const [price, setPrice] = useState("");
+  const formatPrice = (value) => {
+  return value ? Number(value).toFixed(2) : "0.00";
+};
 
   const ENTRY_API = "https://balajirestaurant.onrender.com/entries";
   const ITEM_API = "https://balajirestaurant.onrender.com/products";
@@ -138,6 +141,7 @@ function DailyEntry() {
     setItem(entry.itemName);
     setType(entry.type);
     setQty(entry.quantity);
+     setPrice(Number(entry.price).toFixed(2)); 
     setEditId(entry.id);
 
   };
@@ -261,7 +265,7 @@ function DailyEntry() {
                 </td>
 
                 <td>{e.quantity}</td>
-<td>{e.price}</td>
+<td>₹ {formatPrice(e.price)}</td>
                 <td>
                   <button
                     className="edit-btn"
