@@ -155,13 +155,13 @@ function ItemsEntry({ items, setItems }) {
           <option>Nos</option>
         </select>
 
-        <input
-          type="number"
-          placeholder="Opening Qty"
-          value={qty}
-          onChange={(e) => setQty(e.target.value)}
-        />
-
+      <input
+  type="number"
+  step="0.01"
+  placeholder="Opening Qty"
+  value={qty}
+  onChange={(e) => setQty(e.target.value)}
+/>
         <input
   type="number"
   placeholder="Price per unit"

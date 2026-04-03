@@ -201,12 +201,13 @@ function DailyEntry() {
 
         </select>
 
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={qty}
-          onChange={(e) => setQty(e.target.value)}
-        />
+       <input
+  type="number"
+  step="0.01"
+  placeholder="Quantityng Qty"
+  value={qty}
+  onChange={(e) => setQty(e.target.value)}
+/>
 
         {type === "purchase" && (
   <input
