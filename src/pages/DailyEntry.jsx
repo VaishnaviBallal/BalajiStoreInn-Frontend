@@ -74,11 +74,12 @@ function DailyEntry() {
   return;
 }
 
-   const entry = {
+  const entry = {
   itemName: item,
   type: type,
   quantity: Number(qty),
-  price: type === "purchase" ? Number(price) : 0
+  price: type === "purchase" ? Number(price) : 0,
+ entryTime: date
 };
 
     try {
@@ -204,7 +205,7 @@ function DailyEntry() {
        <input
   type="number"
   step="0.01"
-  placeholder="Quantityng Qty"
+  placeholder="Qunatity"
   value={qty}
   onChange={(e) => setQty(e.target.value)}
 />

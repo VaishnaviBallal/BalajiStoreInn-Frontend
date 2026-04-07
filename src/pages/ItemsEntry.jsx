@@ -157,7 +157,8 @@ function ItemsEntry({ items, setItems }) {
 
       <input
   type="number"
-  step="0.01"
+  step="any"
+  min="0"
   placeholder="Opening Qty"
   value={qty}
   onChange={(e) => setQty(e.target.value)}
