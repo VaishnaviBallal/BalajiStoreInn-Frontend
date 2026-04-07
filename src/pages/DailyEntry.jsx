@@ -153,6 +153,7 @@ const loadAllEntries = async () => {
   const editEntry = (entry) => {
 
     setItem(entry.itemName);
+    setDate(entry.entryTime);   // ✅ ADD THIS
     setType(entry.type);
     setQty(entry.quantity);
      setPrice(Number(entry.price).toFixed(2)); 
