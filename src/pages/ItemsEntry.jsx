@@ -15,6 +15,9 @@ function ItemsEntry({ items, setItems }) {
 };
 
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
+const [showSuggestions, setShowSuggestions] = useState(false);
 
   const API_URL =  "https://balajirestaurant.onrender.com/products";
 
@@ -137,12 +140,55 @@ function ItemsEntry({ items, setItems }) {
 
       <div className="form-box">
 
-        <input
-          type="text"
-          placeholder="Item Name"
-          value={itemName}
-          onChange={(e) => setItemName(e.target.value)}
-        />
+       <div style={{ position: "relative" }}>
+
+  <input
+    type="text"
+    placeholder="Enter or search item..."
+    value={itemName}
+    onChange={(e) => {
+      const value = e.target.value;
+      setItemName(value);
+
+      if (value.trim() === "") {
+        setFilteredItems([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      const filtered = items.filter(i =>
+        i.name.toLowerCase().includes(value.toLowerCase())
+      );
+
+      setFilteredItems(filtered);
+      setShowSuggestions(true);
+    }}
+    onFocus={() => {
+      if (itemName) setShowSuggestions(true);
+    }}
+    onBlur={() => {
+      setTimeout(() => setShowSuggestions(false), 200);
+    }}
+  />
+
+  {showSuggestions && filteredItems.length > 0 && (
+    <div className="suggestions-box">
+      {filteredItems.map((i) => (
+        <div
+          key={i.id}
+          className="suggestion-item"
+          onClick={() => {
+            setItemName(i.name);
+            setShowSuggestions(false);
+          }}
+        >
+          {i.name}
+        </div>
+      ))}
+    </div>
+  )}
+
+</div>
 
         <select
           value={unit}
@@ -184,11 +230,12 @@ function ItemsEntry({ items, setItems }) {
 
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Date</th>
               <th>Item</th>
               <th>Unit</th>
               <th>Opening Qty</th>
               <th>Price</th>
+              <th>Total Price</th>
               <th>Edit</th>
               <th>Delete</th>
             </tr>
@@ -200,11 +247,12 @@ function ItemsEntry({ items, setItems }) {
 
               <tr key={item.id}>
 
-                <td>{index + 1}</td>
+               <td>{item.createdDate}</td>
                 <td>{item.name}</td>
                 <td>{item.unit}</td>
                 <td>{item.quantity}</td>
                 <td>{formatPrice(item.price)}</td>
+                <td>{formatPrice(item.quantity * item.price)}</td> {/* ✅ NEW */}
 
                 <td>
                   <button

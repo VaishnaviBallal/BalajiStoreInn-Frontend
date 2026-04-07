@@ -258,6 +258,7 @@ const loadAllEntries = async () => {
               <th>Type</th>
               <th>Quantity</th>
               <th>Price</th>
+               <th>Total Price</th>
               <th>Edit</th>
               <th>Delete</th>
             </tr>
@@ -284,6 +285,7 @@ const loadAllEntries = async () => {
 
                 <td>{e.quantity}</td>
 <td>₹ {formatPrice(e.price)}</td>
+<td>{formatPrice(item.quantity * item.price)}</td> {/* ✅ NEW */}
                 <td>
                   <button
                     className="edit-btn"
