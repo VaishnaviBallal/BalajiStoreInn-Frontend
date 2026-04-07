@@ -143,7 +143,7 @@ const Reports = () => {
             {reports.map((item,index)=>(
 
               <tr key={index}>
-                <td>{item.dateRange}</td>
+                <td>{new Date(item.date).toLocaleDateString()}</td>
                 <td>{item.itemName}</td>
                 <td>{item.openingStock}</td>
                 <td>{item.purchased}</td>
