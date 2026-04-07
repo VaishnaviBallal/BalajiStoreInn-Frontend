@@ -126,6 +126,7 @@ const Reports = () => {
 
           <thead>
             <tr>
+              <th>Date</th>
               <th>Item Name</th>
               <th>Opening</th>
               <th>Purchased</th>
