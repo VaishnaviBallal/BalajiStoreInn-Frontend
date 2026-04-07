@@ -26,28 +26,41 @@ function DailyEntry() {
   const ITEM_API = "https://balajirestaurant.onrender.com/products";
 
   
-  // Load entries + items
   useEffect(() => {
+  loadEntries();
+  loadItems();
+}, []);
+
+  // 🔥 NEW: Load entries when date changes
+useEffect(() => {
+  if (date) {
     loadEntries();
-    loadItems();
-  }, []);
+  }
+}, [date]);
 
   // Load daily entries
-  const loadEntries = async () => {
+ const loadEntries = async () => {
+  try {
+    if (!date) return; // 🔥 prevent empty call
 
-    try {
+    const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
+    setEntries(res.data);
+  } catch (error) {
+    console.log(error);
+    toast.error("Error loading entries");
+  }
+};
 
-      const res = await axios.get(ENTRY_API);
-      setEntries(res.data);
-
-    } catch (error) {
-
-      console.log(error);
-      toast.error("Error loading entries");
-
-    }
-
-  };
+const loadAllEntries = async () => {
+  try {
+    const res = await axios.get(`${ENTRY_API}/all`);
+    setEntries(res.data);
+  } catch (error) {
+    console.log(error);
+    toast.error("Error loading all entries");
+  }
+};
+  
 
   // Load items
   const loadItems = async () => {
@@ -98,7 +111,7 @@ function DailyEntry() {
 
       loadEntries();
 
-      setDate("");
+      loadEntries(); // reload same selected date
       setItem("");
       setType("");
       setQty("");
@@ -205,7 +218,7 @@ function DailyEntry() {
        <input
   type="number"
   step="0.01"
-  placeholder="Qunatity"
+  placeholder="Quantity"
   value={qty}
   onChange={(e) => setQty(e.target.value)}
 />
@@ -225,7 +238,9 @@ function DailyEntry() {
         >
           {editId ? "Update Entry" : "Save"}
         </button>
-
+<button onClick={loadAllEntries} className="button">
+  Show All Entries
+</button>
       </div>
 
       <h3>Daily Records</h3>
