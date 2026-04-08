@@ -55,7 +55,7 @@ function ItemLookup() {
 
       {/* Result Card */}
       {data && (
-        <div className="card">
+        <div className="search-card">
 
           <h2 className="item-title">{data.itemName}</h2>
 
