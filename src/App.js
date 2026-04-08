@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import ItemsEntry from "./pages/ItemsEntry";
 import DailyEntry from "./pages/DailyEntry";
 import Reports from "./pages/Reports";
+import ItemLookup from "./pages/ItemLookup";
 
 function App() {
 
@@ -46,7 +47,7 @@ function App() {
             />
           } 
         />
-
+<Route path="/item-lookup" element={<ItemLookup />} />
         <Route 
           path="/reports" 
           element={<Reports entries={entries} />} 

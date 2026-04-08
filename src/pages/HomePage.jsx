@@ -56,6 +56,10 @@ function HomePage(){
      Daily Entry
     </button>
 
+    <button onClick={() => navigate("/item-lookup")}>
+  🔍 Item Lookup
+</button>
+
     <button onClick={()=>navigate("/reports")}>
      Reports
     </button>
