@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+
+import { useState,useEffect } from "react";
 import "../styles/Login.css";
 
 import { ToastContainer, toast } from "react-toastify";
@@ -12,6 +13,22 @@ function LoginPage(){
  const [username,setUsername] = useState("");
  const [password,setPassword] = useState("");
 
+useEffect(() => {
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      login();
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+
+}, [username, password]);
+ 
  const login = () =>{
 
   if(username === "" || password === ""){

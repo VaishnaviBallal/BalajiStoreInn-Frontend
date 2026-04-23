@@ -22,9 +22,26 @@ function DailyEntry() {
   return value ? Number(value).toFixed(2) : "0.00";
 };
 
-  const ENTRY_API = "https://balajirestaurant.onrender.com/entries";
+  const ENTRY_API =  "https://balajirestaurant.onrender.com/entries";
   const ITEM_API = "https://balajirestaurant.onrender.com/products";
 
+  useEffect(() => {
+
+  const handleKeyDown = (e) => {
+
+    if (e.key === "Enter") {
+      saveEntry();   // 🔥 triggers save/update entry
+    }
+
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+
+}, [date, item, type, qty, price, editId]);
   
   useEffect(() => {
   loadEntries();
@@ -285,7 +302,7 @@ const loadAllEntries = async () => {
 
                 <td>{e.quantity}</td>
 <td>₹ {formatPrice(e.price)}</td>
-<td>{formatPrice(item.quantity * item.price)}</td> {/* ✅ NEW */}
+<td>₹ {formatPrice(e.totalPrice)}</td>
                 <td>
                   <button
                     className="edit-btn"

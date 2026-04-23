@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/Reports.css";
@@ -13,11 +13,12 @@ const Reports = () => {
   const [reports, setReports] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const formatNumber = (value) => {
-  return value ? Number(value).toFixed(2) : "0.00";
-};
 
-  // Fetch Report
+  const formatNumber = (value) => {
+    return value ? Number(value).toFixed(2) : "0.00";
+  };
+
+  // 🔥 FETCH REPORT
   const fetchReport = async () => {
 
     if (!startDate || !endDate) {
@@ -28,37 +29,32 @@ const Reports = () => {
     try {
 
       const response = await axios.get(
-  `https://balajirestaurant.onrender.com/reports/items?start=${startDate}&end=${endDate}`
-);
+        `https://balajirestaurant.onrender.com/reports/items?start=${startDate}&end=${endDate}`
+      );
 
       if (Array.isArray(response.data)) {
 
         setReports(response.data);
 
-        if(response.data.length === 0){
+        if (response.data.length === 0) {
           toast.info("No data found for selected dates");
-        }else{
+        } else {
           toast.success("Report generated successfully");
         }
 
       } else {
-
         setReports([]);
         toast.error("Invalid report data");
-
       }
 
     } catch (error) {
-
-      console.error("Error fetching report:", error);
+      console.error(error);
       setReports([]);
       toast.error("Error fetching report");
-
     }
-
   };
 
-  // Download PDF
+  // 🔥 DOWNLOAD PDF
   const downloadPdf = () => {
 
     if (!startDate || !endDate) {
@@ -69,26 +65,39 @@ const Reports = () => {
     toast.success("Downloading PDF...");
 
     window.open(
-  `https://balajirestaurant.onrender.com/reports/items/pdf?start=${startDate}&end=${endDate}`
-);
-
+      `https://balajirestaurant.onrender.com/reports/items/pdf?start=${startDate}&end=${endDate}`
+    );
   };
+
+  // ⭐ ENTER KEY SUPPORT (GLOBAL FOR THIS PAGE)
+  useEffect(() => {
+
+    const handleKeyDown = (e) => {
+
+      if (e.key === "Enter") {
+        fetchReport();   // default action = generate report
+      }
+
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+
+  }, [startDate, endDate]);
 
   return (
 
     <div className="report-container">
 
-      {/* Home Button */}
-      <button
-        className="backBtn"
-        onClick={() => navigate("/home")}
-      >
+      <button className="backBtn" onClick={() => navigate("/home")}>
         🏠 Home
       </button>
 
       <h2>Store Reports</h2>
 
-      {/* Date Selection */}
       <div className="date-selection">
 
         <input
@@ -103,23 +112,16 @@ const Reports = () => {
           onChange={(e) => setEndDate(e.target.value)}
         />
 
-        <button
-          className="generate-btn"
-          onClick={fetchReport}
-        >
+        <button className="generate-btn" onClick={fetchReport}>
           Generate Report
         </button>
 
-        <button
-          className="download-btn"
-          onClick={downloadPdf}
-        >
+        <button className="download-btn" onClick={downloadPdf}>
           Download PDF
         </button>
 
       </div>
 
-      {/* Table Container */}
       <div className="report-table-container">
 
         <table className="report-table">
@@ -133,15 +135,14 @@ const Reports = () => {
               <th>Used</th>
               <th>Closing</th>
               <th>Purchase ₹</th>
-<th>Usage ₹</th>
-<th>Stock Value ₹</th>
+              <th>Usage ₹</th>
+              <th>Stock Value ₹</th>
             </tr>
           </thead>
 
           <tbody>
 
-            {reports.map((item,index)=>(
-
+            {reports.map((item, index) => (
               <tr key={index}>
                 <td>{new Date(item.date).toLocaleDateString()}</td>
                 <td>{item.itemName}</td>
@@ -150,10 +151,9 @@ const Reports = () => {
                 <td>{item.used}</td>
                 <td>{item.closingStock}</td>
                 <td>{formatNumber(item.purchaseAmount)}</td>
-<td>{formatNumber(item.usageAmount)}</td>
-<td>{formatNumber(item.stockValue)}</td>
+                <td>{formatNumber(item.usageAmount)}</td>
+                <td>{formatNumber(item.stockValue)}</td>
               </tr>
-
             ))}
 
           </tbody>
@@ -162,16 +162,11 @@ const Reports = () => {
 
       </div>
 
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={2000}
-      />
+      <ToastContainer position="top-right" autoClose={2000} />
 
     </div>
 
   );
-
 };
 
 export default Reports;

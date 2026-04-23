@@ -7,13 +7,14 @@ function ItemLookup() {
 
   const navigate = useNavigate();
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");   // ✅ FIX ADDED
   const [data, setData] = useState(null);
 
   const API = "https://balajirestaurant.onrender.com/reports/item";
 
   const searchItem = async () => {
-    if (!search) {
+
+    if (!search.trim()) {
       alert("Please enter item name");
       return;
     }
@@ -31,6 +32,13 @@ function ItemLookup() {
     }
   };
 
+  // ✅ ENTER KEY HANDLER
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      searchItem();
+    }
+  };
+
   return (
     <div className="page">
 
@@ -43,17 +51,20 @@ function ItemLookup() {
 
       {/* Search Box */}
       <div className="search-box">
+
         <input
           type="text"
           placeholder="Search item..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}   // ⭐ ENTER SUPPORT
         />
 
         <button onClick={searchItem}>Search</button>
+
       </div>
 
-      {/* Result Card */}
+      {/* Result */}
       {data && (
         <div className="search-card">
 
