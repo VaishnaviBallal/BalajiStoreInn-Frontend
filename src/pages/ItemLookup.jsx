@@ -10,9 +10,28 @@ function ItemLookup() {
   const [search, setSearch] = useState("");   // ✅ FIX ADDED
   const [data, setData] = useState(null);
 
-  const API = "https://balajirestaurant.onrender.com/reports/item";
+  const API = "http://localhost:8080/reports/item";
+
+  const handleChange = async (e) => {
+  const value = e.target.value;
+  setSearch(value);
+
+  if (!value.trim()) {
+    setData(null);
+    return;
+  }
+
+  try {
+    const res = await axios.get(`${API}?name=${value}`);
+    setData(res.data);
+  } catch {
+    setData(null);
+  }
+};
+
 
   const searchItem = async () => {
+
 
     if (!search.trim()) {
       alert("Please enter item name");

@@ -12,6 +12,7 @@ import DailyEntry from "./pages/DailyEntry";
 import Reports from "./pages/Reports";
 import ItemLookup from "./pages/ItemLookup";
 
+
 function App() {
 
   const [items, setItems] = useState([]);
@@ -55,12 +56,16 @@ function App() {
 
       </Routes>
 
+{/* ✅ Footer goes here */}
+  
+
       {/* Toast Notification System */}
       <ToastContainer position="top-right" autoClose={2000} />
 
     </BrowserRouter>
 
   );
+  
 }
 
 export default App;
