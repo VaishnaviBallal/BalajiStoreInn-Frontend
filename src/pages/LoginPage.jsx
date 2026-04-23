@@ -5,6 +5,7 @@ import "../styles/Login.css";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import bg from "../assets/login-bg.jpg";
 
 function LoginPage(){
 
@@ -57,8 +58,8 @@ useEffect(() => {
 
  return(
 
-  <div className="login-container">
-
+  <div className="login-container"
+style={{ backgroundImage: `url(${bg})` }}>
    <div className="login-box">
 
     <h2>Balaji Inn Store</h2>
