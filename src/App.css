@@ -190,34 +190,31 @@ h3{
 
 /* Edit Button */
 
-.edit-btn{
-  background:#2196F3;
-  color:white;
-  border:none;
-  padding:6px 10px;
-  border-radius:5px;
-  cursor:pointer;
+.edit-btn {
+  background: #2196F3 !important;
+  color: white !important;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.edit-btn:hover{
-  background:#0b7dda;
+.delete-btn {
+  background: red !important;
+  color: white !important;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-/* Delete Button */
-
-.delete-btn{
-  background:red;
-  color:white;
-  border:none;
-  padding:6px 10px;
-  border-radius:5px;
-  cursor:pointer;
+.edit-btn:hover {
+  background: #0b7dda !important;
 }
 
-.delete-btn:hover{
-  background:#c40000;
+.delete-btn:hover {
+  background: #c40000 !important;
 }
-
 /* Search Box */
 
 .searchBox{

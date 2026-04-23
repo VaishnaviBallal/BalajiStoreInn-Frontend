@@ -215,11 +215,11 @@ function DailyEntry() {
               <td>₹ {formatPrice(e.totalPrice)}</td>
 
               <td>
-                <button onClick={() => editEntry(e)}>Edit</button>
+                <button className="edit-btn" onClick={() => editEntry(e)}>Edit</button>
               </td>
 
               <td>
-                <button onClick={() => deleteEntry(e.id)}>Delete</button>
+                <button className="delete-btn" onClick={() => deleteEntry(e.id)}>Delete</button>
               </td>
             </tr>
           ))}
