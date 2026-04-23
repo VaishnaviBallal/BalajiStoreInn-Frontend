@@ -348,3 +348,38 @@ h3{
 .suggestion-item:hover {
   background-color: #f1f1f1;
 }
+
+/* React Select container size */
+.item-select {
+  width: 220px;
+}
+
+/* Control box (input area) */
+.item-select .css-13cymwt-control {
+  min-height: 38px;
+  height: 38px;
+  font-size: 14px;
+}
+
+/* Value container */
+.item-select .css-1fdsijx-ValueContainer {
+  height: 38px;
+  padding: 0 8px;
+}
+
+/* Input typing area */
+.item-select .css-1jqq78o-placeholder,
+.item-select .css-qbdosj-Input {
+  margin: 0;
+  padding: 0;
+}
+
+/* Dropdown arrow container */
+.item-select .css-1hb7zxy-IndicatorsContainer {
+  height: 38px;
+}
+
+/* Dropdown menu */
+.item-select .css-1nmdiq5-menu {
+  z-index: 9999;
+}

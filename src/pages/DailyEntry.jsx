@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+import Select from "react-select";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -16,183 +18,125 @@ function DailyEntry() {
   const [item, setItem] = useState("");
   const [type, setType] = useState("");
   const [qty, setQty] = useState("");
-  const [editId, setEditId] = useState(null);
   const [price, setPrice] = useState("");
-  const formatPrice = (value) => {
-  return value ? Number(value).toFixed(2) : "0.00";
-};
+  const [editId, setEditId] = useState(null);
 
-  const ENTRY_API =  "https://balajirestaurant.onrender.com/entries";
+  const ENTRY_API = "https://balajirestaurant.onrender.com/entries";
   const ITEM_API = "https://balajirestaurant.onrender.com/products";
 
+  const itemOptions = items.map(i => ({
+    value: i.name,
+    label: i.name
+  }));
+
   useEffect(() => {
-
-  const handleKeyDown = (e) => {
-
-    if (e.key === "Enter") {
-      saveEntry();   // 🔥 triggers save/update entry
-    }
-
-  };
-
-  window.addEventListener("keydown", handleKeyDown);
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-
-}, [date, item, type, qty, price, editId]);
-  
-  useEffect(() => {
-  loadEntries();
-  loadItems();
-}, []);
-
-  // 🔥 NEW: Load entries when date changes
-useEffect(() => {
-  if (date) {
     loadEntries();
-  }
-}, [date]);
+    loadItems();
+  }, []);
 
-  // Load daily entries
- const loadEntries = async () => {
-  try {
-    if (!date) return; // 🔥 prevent empty call
+  useEffect(() => {
+    if (date) loadEntries();
+  }, [date]);
 
-    const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
-    setEntries(res.data);
-  } catch (error) {
-    console.log(error);
-    toast.error("Error loading entries");
-  }
-};
-
-const loadAllEntries = async () => {
-  try {
-    const res = await axios.get(`${ENTRY_API}/all`);
-    setEntries(res.data);
-  } catch (error) {
-    console.log(error);
-    toast.error("Error loading all entries");
-  }
-};
-  
-
-  // Load items
-  const loadItems = async () => {
-
+  const loadEntries = async () => {
     try {
+      if (!date) return;
+      const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
+      setEntries(res.data);
+    } catch (error) {
+      toast.error("Error loading entries");
+    }
+  };
 
+  const loadAllEntries = async () => {
+    try {
+      const res = await axios.get(`${ENTRY_API}/all`);
+      setEntries(res.data);
+    } catch (error) {
+      toast.error("Error loading all entries");
+    }
+  };
+
+  const loadItems = async () => {
+    try {
       const res = await axios.get(ITEM_API);
       setItems(res.data);
-
     } catch (error) {
-
-      console.log(error);
       toast.error("Error loading items");
-
     }
-
   };
 
-  // Save entry
   const saveEntry = async () => {
 
-  if (!date || !item || !type || !qty || (type === "purchase" && !price)) {
-  toast.warning("Please fill all fields");
-  return;
-}
+    if (!date || !item || !type || !qty || (type === "purchase" && !price)) {
+      toast.warning("Please fill all fields");
+      return;
+    }
 
-  const entry = {
-  itemName: item,
-  type: type,
-  quantity: Number(qty),
-  price: type === "purchase" ? Number(price) : 0,
- entryTime: date
-};
+    const entry = {
+      itemName: item,
+      type,
+      quantity: Number(qty),
+      price: type === "purchase" ? Number(price) : 0,
+      entryTime: date
+    };
 
     try {
-
       if (editId) {
-
         await axios.put(`${ENTRY_API}/${editId}`, entry);
         toast.success("Entry updated");
-
       } else {
-
         await axios.post(ENTRY_API, entry);
         toast.success("Entry saved");
-
       }
 
       loadEntries();
 
-      loadEntries(); // reload same selected date
       setItem("");
       setType("");
       setQty("");
-      setEditId(null);
       setPrice("");
+      setEditId(null);
 
     } catch (error) {
-
-      console.error(error);
       toast.error("Error saving entry");
-
     }
-
   };
 
-  // Delete entry
   const deleteEntry = async (id) => {
-
-    if (!window.confirm("Are you sure you want to delete this entry?")) return;
+    if (!window.confirm("Are you sure?")) return;
 
     try {
-
       await axios.delete(`${ENTRY_API}/${id}`);
-
       setEntries(entries.filter(e => e.id !== id));
-
-      toast.success("Entry deleted");
-
+      toast.success("Deleted");
     } catch (error) {
-
-      console.error(error);
-      toast.error("Error deleting entry");
-
+      toast.error("Error deleting");
     }
-
   };
 
-  // Edit entry
   const editEntry = (entry) => {
-
     setItem(entry.itemName);
-    setDate(entry.entryTime);   // ✅ ADD THIS
+    setDate(entry.entryTime);
     setType(entry.type);
     setQty(entry.quantity);
-     setPrice(Number(entry.price).toFixed(2)); 
+    setPrice(entry.price);
     setEditId(entry.id);
+  };
 
+  const formatPrice = (value) => {
+    return value ? Number(value).toFixed(2) : "0.00";
   };
 
   return (
-
     <div className="page">
 
-      {/* Home Button */}
-      <button
-        className="backBtn"
-        onClick={() => navigate("/home")}
-      >
+      <button className="backBtn" onClick={() => navigate("/home")}>
         🏠 Home
       </button>
 
       <h2>Daily Entry</h2>
 
-      {/* Form */}
       <div className="form-box">
 
         <input
@@ -201,142 +145,92 @@ const loadAllEntries = async () => {
           onChange={(e) => setDate(e.target.value)}
         />
 
-        <select
-          value={item}
-          onChange={(e) => setItem(e.target.value)}
-        >
-
-          <option value="" disabled>
-            Select Item
-          </option>
-
-          {items.length > 0 ? (
-            items.map((i) => (
-              <option key={i.id} value={i.name}>
-                {i.name}
-              </option>
-            ))
-          ) : (
-            <option disabled>Loading items...</option>
-          )}
-
-        </select>
-
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-
+        {/* ✅ FIXED DROPDOWN WRAPPED IN DIV */}
+       <div className="item-select">
+  <Select
+    options={itemOptions}
+    value={itemOptions.find(o => o.value === item) || null}
+    onChange={(selected) => setItem(selected?.value || "")}
+    placeholder="Select Item"
+    isClearable
+  />
+</div>
+        <select value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">Select Type</option>
           <option value="purchase">Purchase</option>
           <option value="usage">Usage</option>
-
         </select>
 
-       <input
-  type="number"
-  step="0.01"
-  placeholder="Quantity"
-  value={qty}
-  onChange={(e) => setQty(e.target.value)}
-/>
+        <input
+          type="number"
+          placeholder="Quantity"
+          value={qty}
+          onChange={(e) => setQty(e.target.value)}
+        />
 
         {type === "purchase" && (
-  <input
-    type="number"
-    placeholder="Price per unit"
-    value={price}
-    onChange={(e) => setPrice(e.target.value)}
-  />
-)}
+          <input
+            type="number"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+        )}
 
-        <button
-          className="button"
-          onClick={saveEntry}
-        >
+        <button className="button" onClick={saveEntry}>
           {editId ? "Update Entry" : "Save"}
         </button>
-<button onClick={loadAllEntries} className="button">
-  Show All Entries
-</button>
+
+        <button onClick={loadAllEntries} className="button">
+          Show All Entries
+        </button>
+
       </div>
 
       <h3>Daily Records</h3>
 
-      {/* Table */}
-      <div className="table-container">
+      <table className="table">
 
-        <table className="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
 
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Item</th>
-              <th>Type</th>
-              <th>Quantity</th>
-              <th>Price</th>
-               <th>Total Price</th>
-              <th>Edit</th>
-              <th>Delete</th>
+        <tbody>
+          {entries.map(e => (
+            <tr key={e.id}>
+              <td>{e.entryTime}</td>
+              <td>{e.itemName}</td>
+              <td>{e.type}</td>
+              <td>{e.quantity}</td>
+              <td>₹ {formatPrice(e.price)}</td>
+              <td>₹ {formatPrice(e.totalPrice)}</td>
+
+              <td>
+                <button onClick={() => editEntry(e)}>Edit</button>
+              </td>
+
+              <td>
+                <button onClick={() => deleteEntry(e.id)}>Delete</button>
+              </td>
             </tr>
-          </thead>
+          ))}
+        </tbody>
 
-          <tbody>
-
-            {entries.map((e) => (
-
-              <tr key={e.id}>
-
-               <td>{e.entryTime}</td>
-
-                <td>{e.itemName}</td>
-
-                <td
-                  style={{
-                    color: e.type === "purchase" ? "green" : "red",
-                    fontWeight: "bold"
-                  }}
-                >
-                  {e.type}
-                </td>
-
-                <td>{e.quantity}</td>
-<td>₹ {formatPrice(e.price)}</td>
-<td>₹ {formatPrice(e.totalPrice)}</td>
-                <td>
-                  <button
-                    className="edit-btn"
-                    onClick={() => editEntry(e)}
-                  >
-                    Edit
-                  </button>
-                </td>
-
-                <td>
-                  <button
-                    className="delete-btn"
-                    onClick={() => deleteEntry(e.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
-
-      </div>
+      </table>
 
       <ToastContainer position="top-right" autoClose={2000} />
 
     </div>
-
   );
-
 }
 
 export default DailyEntry;
