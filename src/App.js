@@ -11,7 +11,8 @@ import ItemsEntry from "./pages/ItemsEntry";
 import DailyEntry from "./pages/DailyEntry";
 import Reports from "./pages/Reports";
 import ItemLookup from "./pages/ItemLookup";
-
+import BinEntries from "./pages/BinEntries";
+import MenuPage from "../src/Components/MenuPage";
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
 
         <Route path="/home" element={<HomePage />} />
+        <Route path="/menu" element={<MenuPage />} />
 
         <Route 
           path="/dashboard" 
@@ -53,8 +55,9 @@ function App() {
           path="/reports" 
           element={<Reports entries={entries} />} 
         />
-
+ <Route path="/bin" element={<BinEntries />} />
       </Routes>
+     
 
 {/* ✅ Footer goes here */}
   

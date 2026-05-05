@@ -51,6 +51,10 @@ function MenuPage() {
         <Link to="/reports">
           <button>Reports</button>
         </Link>
+        
+        <Link to="/bin">
+  <button>🗑️ Recycle Bin</button>
+</Link>
 
       </div>
 

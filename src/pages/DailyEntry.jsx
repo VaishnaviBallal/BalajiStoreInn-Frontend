@@ -21,8 +21,8 @@ function DailyEntry() {
   const [price, setPrice] = useState("");
   const [editId, setEditId] = useState(null);
 
-  const ENTRY_API = "https://balajirestaurant.onrender.com/entries";
-  const ITEM_API = "https://balajirestaurant.onrender.com/products";
+  const ENTRY_API ="http://localhost:8080/entries" ;
+  const ITEM_API = "http://localhost:8080/products";
 
   const itemOptions = items.map(i => ({
     value: i.name,
@@ -30,32 +30,43 @@ function DailyEntry() {
   }));
 
   useEffect(() => {
-    loadEntries();
-    loadItems();
-  }, []);
+  loadItems();        // dropdown always loads
+  loadAllEntries();   // table shows all initially
+}, []);
 
-  useEffect(() => {
-    if (date) loadEntries();
-  }, [date]);
+useEffect(() => {
+  if (date) {
+    loadEntriesByDate();
+  } else {
+    loadAllEntries();
+  }
+}, [date]);
 
-  const loadEntries = async () => {
-    try {
-      if (!date) return;
-      const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
-      setEntries(res.data);
-    } catch (error) {
-      toast.error("Error loading entries");
-    }
-  };
+ const loadEntries = async () => {
+  try {
+    const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
+    setEntries(res.data);
+  } catch (error) {
+    toast.error("Error loading entries");
+  }
+};
+const loadEntriesByDate = async () => {
+  try {
+    const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
+    setEntries(res.data);
+  } catch (error) {
+    toast.error("Error loading entries");
+  }
+};
 
-  const loadAllEntries = async () => {
-    try {
-      const res = await axios.get(`${ENTRY_API}/all`);
-      setEntries(res.data);
-    } catch (error) {
-      toast.error("Error loading all entries");
-    }
-  };
+ const loadAllEntries = async () => {
+  try {
+    const res = await axios.get(`${ENTRY_API}/all`);
+    setEntries(res.data);
+  } catch (error) {
+    toast.error("Error loading all entries");
+  }
+};
 
   const loadItems = async () => {
     try {

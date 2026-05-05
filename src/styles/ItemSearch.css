@@ -1,15 +1,21 @@
+/* =========================
+   PAGE
+========================= */
 .page {
+  min-height: 100vh;
   padding: 20px;
   font-family: Arial, sans-serif;
+  background: #f7f9fc;
 }
 
-/* Header */
 h2 {
   margin-bottom: 20px;
   color: #333;
 }
 
-/* Back Button */
+/* =========================
+   BACK BUTTON
+========================= */
 .backBtn {
   margin-bottom: 15px;
   padding: 8px 14px;
@@ -24,14 +30,17 @@ h2 {
   background-color: #125ea2;
 }
 
-/* Search Box */
+/* =========================
+   SEARCH BOX
+========================= */
 .search-box {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  position: relative;
 }
 
 .search-box input {
   padding: 10px;
-  width: 260px;
+  width: 280px;
   margin-right: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -44,83 +53,151 @@ h2 {
   background-color: #28a745;
   color: white;
   border-radius: 6px;
+  margin-right: 8px;
 }
 
 .search-box button:hover {
   background-color: #1e7e34;
 }
 
-/* Card UI */
-.search-card {
-  margin-top: 5px;
-  padding: 15px;
-  border-radius: 10px;
+.downloadBtn {
+  margin-left: 12px;
+  background-color: #1976d2;
+}
+
+.downloadBtn:hover {
+  background-color: #125ea2;
+}
+
+/* =========================
+   DROPDOWN
+========================= */
+.dropdown {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  width: 280px;
   background: #ffffff;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  max-width: 600px;
-  width:400px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1000;
+
+  /* 👇 ADD THIS */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Title */
-.item-title {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #222;
+.dropdown li {
+  padding: 10px;
+  cursor: pointer;
 }
 
-/* Grid Layout */
+.dropdown li:hover {
+  background-color: #f0f0f0;
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+.result-layout {
+  display: flex;
+  gap: 20px;
+}
+
+/* =========================
+   LEFT CARD
+========================= */
+.search-card {
+  width: 32%;
+  min-width: 320px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-/* Boxes */
 .box {
   background: #f5f7fa;
-  padding: 10px;
+  padding: 14px;
   border-radius: 10px;
   text-align: center;
-  transition: 0.2s;
 }
 
-.box:hover {
-  transform: scale(1.05);
-}
-
-/* Labels */
-.box span {
-  font-size: 13px;
-  color: #666;
-}
-
-/* Values */
-.box h3 {
-  margin-top: 5px;
-  color: #222;
-}
-
-/* Money highlight */
 .money {
   background: #e8f5e9;
 }
 
-/* Total highlight */
 .total {
   background: #e3f2fd;
   grid-column: span 2;
 }
 
-.total h2 {
-  margin-top: 5px;
-  color: #0d47a1;
-}
-
-.page {
-  position: relative;
-  min-height: 100vh;
+/* =========================
+   RIGHT TABLE
+========================= */
+.history-table {
+  width: 68%;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   padding: 20px;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
+  overflow-x: auto;
 }
 
+.history-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+}
+
+.history-table th,
+.history-table td {
+  padding: 14px;
+  text-align: center;
+}
+
+/* =========================
+   TABLE STYLING ✅
+========================= */
+.history-table th {
+  background-color: #1976d2;
+  color: white;
+  font-weight: bold;
+}
+
+.history-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.history-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.history-table td,
+.history-table th {
+  border-bottom: 1px solid #ddd;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 1100px) {
+  .result-layout {
+    flex-direction: column;
+  }
+
+  .search-card,
+  .history-table {
+    width: 100%;
+  }
+}

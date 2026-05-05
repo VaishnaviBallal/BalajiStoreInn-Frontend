@@ -162,5 +162,9 @@ body{
     font-size:13px;
     padding:8px;
   }
+  .report-table tr:last-child {
+  font-weight: bold;
+  background-color: #e3f2fd;
+}
 
 }

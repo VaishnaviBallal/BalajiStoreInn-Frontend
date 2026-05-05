@@ -6,34 +6,48 @@ import "../styles/Reports.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Reports = () => {
+/* =========================
+   NUMBER FORMAT HELPERS
+========================= */
 
+const toNumber = (value) => {
+  if (value === null || value === undefined) return 0;
+  return Number(String(value).replace(/,/g, ""));
+};
+
+const format2 = (value) => {
+  return toNumber(value).toFixed(2);
+};
+
+const formatMoney = (value) => {
+  return toNumber(value).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+const Reports = () => {
   const navigate = useNavigate();
 
   const [reports, setReports] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const formatNumber = (value) => {
-    return value ? Number(value).toFixed(2) : "0.00";
-  };
-
-  // 🔥 FETCH REPORT
+  /* =========================
+     FETCH REPORT
+  ========================= */
   const fetchReport = async () => {
-
     if (!startDate || !endDate) {
       toast.warning("Please select both dates");
       return;
     }
 
     try {
-
       const response = await axios.get(
-        `https://balajirestaurant.onrender.com/reports/items?start=${startDate}&end=${endDate}`
+        `http://balajirestaurant.onrender.com/reports/items?start=${startDate}&end=${endDate}`
       );
 
       if (Array.isArray(response.data)) {
-
         setReports(response.data);
 
         if (response.data.length === 0) {
@@ -41,12 +55,10 @@ const Reports = () => {
         } else {
           toast.success("Report generated successfully");
         }
-
       } else {
         setReports([]);
         toast.error("Invalid report data");
       }
-
     } catch (error) {
       console.error(error);
       setReports([]);
@@ -54,9 +66,10 @@ const Reports = () => {
     }
   };
 
-  // 🔥 DOWNLOAD PDF
+  /* =========================
+     DOWNLOAD PDF
+  ========================= */
   const downloadPdf = () => {
-
     if (!startDate || !endDate) {
       toast.warning("Please select both dates");
       return;
@@ -65,31 +78,51 @@ const Reports = () => {
     toast.success("Downloading PDF...");
 
     window.open(
-      `https://balajirestaurant.onrender.com/reports/items/pdf?start=${startDate}&end=${endDate}`
+      `http://balajirestaurant.onrender.com/items/pdf?start=${startDate}&end=${endDate}`,
+      "_blank"
     );
   };
 
-  // ⭐ ENTER KEY SUPPORT (GLOBAL FOR THIS PAGE)
+  /* =========================
+     ENTER KEY SUPPORT
+  ========================= */
   useEffect(() => {
-
     const handleKeyDown = (e) => {
-
       if (e.key === "Enter") {
-        fetchReport();   // default action = generate report
+        fetchReport();
       }
-
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [startDate, endDate]);
 
-  return (
+  /* =========================
+     TOTAL CALCULATION ✅
+  ========================= */
+  const totals = reports.reduce(
+    (acc, item) => {
+      acc.opening += toNumber(item.openingStock);
+      acc.purchased += toNumber(item.purchased);
+      acc.used += toNumber(item.used);
+      acc.closing += toNumber(item.closingStock);
+      acc.purchaseAmt += toNumber(item.purchaseAmount);
+      acc.usageAmt += toNumber(item.usageAmount);
+      acc.stockValue += toNumber(item.stockValue);
+      return acc;
+    },
+    {
+      opening: 0,
+      purchased: 0,
+      used: 0,
+      closing: 0,
+      purchaseAmt: 0,
+      usageAmt: 0,
+      stockValue: 0,
+    }
+  );
 
+  return (
     <div className="report-container">
 
       <button className="backBtn" onClick={() => navigate("/home")}>
@@ -98,8 +131,8 @@ const Reports = () => {
 
       <h2>Store Reports</h2>
 
+      {/* DATE SELECTION */}
       <div className="date-selection">
-
         <input
           type="date"
           value={startDate}
@@ -119,11 +152,10 @@ const Reports = () => {
         <button className="download-btn" onClick={downloadPdf}>
           Download PDF
         </button>
-
       </div>
 
+      {/* TABLE */}
       <div className="report-table-container">
-
         <table className="report-table">
 
           <thead>
@@ -141,31 +173,52 @@ const Reports = () => {
           </thead>
 
           <tbody>
-
             {reports.map((item, index) => (
               <tr key={index}>
                 <td>{new Date(item.date).toLocaleDateString()}</td>
                 <td>{item.itemName}</td>
-                <td>{item.openingStock}</td>
-                <td>{item.purchased}</td>
-                <td>{item.used}</td>
-                <td>{item.closingStock}</td>
-                <td>{formatNumber(item.purchaseAmount)}</td>
-                <td>{formatNumber(item.usageAmount)}</td>
-                <td>{formatNumber(item.stockValue)}</td>
+
+                <td>{format2(item.openingStock)}</td>
+                <td>{format2(item.purchased)}</td>
+                <td>{format2(item.used)}</td>
+                <td>{format2(item.closingStock)}</td>
+
+                <td>₹ {formatMoney(item.purchaseAmount)}</td>
+                <td>₹ {formatMoney(item.usageAmount)}</td>
+                <td>₹ {formatMoney(item.stockValue)}</td>
               </tr>
             ))}
 
+            {/* ✅ TOTAL ROW */}
+            {reports.length > 0 && (
+              <tr style={{ fontWeight: "bold", background: "#e3f2fd" }}>
+                <td colSpan="2">TOTAL</td>
+
+                <td>{format2(totals.opening)}</td>
+                <td>{format2(totals.purchased)}</td>
+                <td>{format2(totals.used)}</td>
+                <td>{format2(totals.closing)}</td>
+
+                <td>₹ {formatMoney(totals.purchaseAmt)}</td>
+                <td>₹ {formatMoney(totals.usageAmt)}</td>
+                <td>₹ {formatMoney(totals.stockValue)}</td>
+              </tr>
+            )}
+
+            {reports.length === 0 && (
+              <tr>
+                <td colSpan="9" style={{ textAlign: "center" }}>
+                  No data available
+                </td>
+              </tr>
+            )}
           </tbody>
 
         </table>
-
       </div>
 
       <ToastContainer position="top-right" autoClose={2000} />
-
     </div>
-
   );
 };
 

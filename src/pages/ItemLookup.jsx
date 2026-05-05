@@ -1,136 +1,279 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/ItemSearch.css";
 
-function ItemLookup() {
+/* =========================
+   FORMAT HELPERS
+========================= */
+const toNumber = (v) =>
+  v === null || v === undefined ? 0 : Number(String(v).replace(/,/g, ""));
 
+const format2 = (v) => toNumber(v).toFixed(2);
+
+const formatMoney = (v) =>
+  toNumber(v).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+function ItemLookup() {
   const navigate = useNavigate();
 
-  const [search, setSearch] = useState("");   // ✅ FIX ADDED
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
   const [data, setData] = useState(null);
+  const [history, setHistory] = useState([]);
 
-  const API = "http://localhost:8080/reports/item";
+  const [allItems, setAllItems] = useState([]);
 
-  const handleChange = async (e) => {
-  const value = e.target.value;
-  setSearch(value);
+  const SUMMARY_API = "http://localhost:8080/reports/item";
+  const DAYWISE_API = "http://localhost:8080/reports/item/daywise";
+  const PDF_API = "http://localhost:8080/reports/item/daywise/pdf";
 
-  if (!value.trim()) {
-    setData(null);
-    return;
-  }
+  /* =========================
+     LOAD ALL ITEMS
+  ========================= */
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/products")
+      .then((res) => setAllItems(res.data || []))
+      .catch(() => setAllItems([]));
+  }, []);
 
-  try {
-    const res = await axios.get(`${API}?name=${value}`);
-    setData(res.data);
-  } catch {
-    setData(null);
-  }
-};
-
-
-  const searchItem = async () => {
-
-
-    if (!search.trim()) {
-      alert("Please enter item name");
+  /* =========================
+     LOCAL FILTER (NO API)
+  ========================= */
+  useEffect(() => {
+    if (search.trim() === "") {
+      setSuggestions([]);
+      setShowDropdown(false);
       return;
     }
 
+    const filtered = allItems
+      .map((i) => i.name)
+      .filter((name) =>
+        name.toLowerCase().includes(search.toLowerCase())
+      );
+
+    setSuggestions(filtered);
+
+    const exactMatch = filtered.some(
+      (name) => name.toLowerCase() === search.toLowerCase()
+    );
+
+    setShowDropdown(!exactMatch && filtered.length > 0);
+  }, [search, allItems]);
+
+  /* =========================
+     SEARCH API
+  ========================= */
+  const searchItem = async (itemName) => {
+    if (!itemName || !itemName.trim()) return;
+
     try {
-      const res = await axios.get(`${API}?name=${search}`);
-      setData(res.data);
+      setShowDropdown(false);
+
+      const [summaryRes, historyRes] = await Promise.all([
+        axios.get(`${SUMMARY_API}?name=${itemName.trim()}`),
+        axios.get(`${DAYWISE_API}?name=${itemName.trim()}`),
+      ]);
+
+      setData(summaryRes.data);
+      setHistory(historyRes.data || []);
     } catch (err) {
-      if (err.response?.status === 404) {
-        alert("Item not found");
-      } else {
-        alert("Server error");
-      }
+      console.error(err);
       setData(null);
+      setHistory([]);
+      alert("Item not found");
     }
   };
 
-  // ✅ ENTER KEY HANDLER
+  /* =========================
+     ENTER KEY
+  ========================= */
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      searchItem();
-    }
+    if (e.key !== "Enter") return;
+    searchItem(search);
   };
+
+  /* =========================
+     PDF DOWNLOAD
+  ========================= */
+  const downloadPdf = () => {
+    if (!data) return;
+    window.open(`${PDF_API}?name=${data.itemName}`, "_blank");
+  };
+
+  /* =========================
+     TOTAL CALCULATION
+  ========================= */
+  const totals = history.reduce(
+    (acc, r) => {
+      acc.opening += Number(r.openingStock || 0);
+      acc.purchased += Number(r.purchased || 0);
+      acc.used += Number(r.used || 0);
+      acc.closing += Number(r.closingStock || 0);
+      acc.purchaseAmt += Number(r.purchaseAmount || 0);
+      acc.usageAmt += Number(r.usageAmount || 0);
+      acc.stockValue += Number(r.stockValue || 0);
+      return acc;
+    },
+    {
+      opening: 0,
+      purchased: 0,
+      used: 0,
+      closing: 0,
+      purchaseAmt: 0,
+      usageAmt: 0,
+      stockValue: 0,
+    }
+  );
 
   return (
     <div className="page">
-
-      {/* Back Button */}
       <button className="backBtn" onClick={() => navigate("/home")}>
         🏠 Home
       </button>
 
       <h2>Item Lookup</h2>
 
-      {/* Search Box */}
+      {/* SEARCH */}
       <div className="search-box">
-
         <input
           type="text"
-          placeholder="Search item..."
+          placeholder="Type item name..."
           value={search}
+          autoComplete="off"
           onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={handleKeyDown}   // ⭐ ENTER SUPPORT
+          onKeyDown={handleKeyDown}
         />
 
-        <button onClick={searchItem}>Search</button>
+        <button onClick={() => searchItem(search)}>Search</button>
 
+        <button
+          className="downloadBtn"
+          onClick={downloadPdf}
+          disabled={!data}
+        >
+          Download PDF
+        </button>
+
+        {/* DROPDOWN */}
+        {showDropdown && suggestions.length > 0 && (
+          <ul className="dropdown">
+            {suggestions.map((item, idx) => (
+              <li
+                key={idx}
+                onClick={() => {
+                  setSearch(item);
+                  setShowDropdown(false);
+                  searchItem(item);
+                }}
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {/* Result */}
-      {data && (
-        <div className="search-card">
+      {(data || history.length > 0) && (
+        <div className="result-layout">
 
-          <h2 className="item-title">{data.itemName}</h2>
+          {/* SUMMARY */}
+          {data && (
+            <div className="search-card">
+              <h2 className="item-title">{data.itemName}</h2>
 
-          <div className="grid">
-
-            <div className="box">
-              <span>Opening</span>
-              <h3>{data.openingStock}</h3>
+              <div className="grid">
+                <div className="box">
+                  <span>Opening</span>
+                  <h3>{format2(data.openingStock)}</h3>
+                </div>
+                <div className="box">
+                  <span>Purchased</span>
+                  <h3>{format2(data.purchased)}</h3>
+                </div>
+                <div className="box">
+                  <span>Used</span>
+                  <h3>{format2(data.used)}</h3>
+                </div>
+                <div className="box">
+                  <span>Closing</span>
+                  <h3>{format2(data.closingStock)}</h3>
+                </div>
+                <div className="box money">
+                  <span>Purchase ₹</span>
+                  <h3>{formatMoney(data.purchaseAmount)}</h3>
+                </div>
+                <div className="box money">
+                  <span>Usage ₹</span>
+                  <h3>{formatMoney(data.usageAmount)}</h3>
+                </div>
+                <div className="box total">
+                  <span>Stock Value ₹</span>
+                  <h2>{formatMoney(data.stockValue)}</h2>
+                </div>
+              </div>
             </div>
+          )}
 
-            <div className="box">
-              <span>Purchased</span>
-              <h3>{data.purchased}</h3>
+          {/* TABLE */}
+          {history.length > 0 && (
+            <div className="history-table">
+              <h2>Daywise Report</h2>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Opening</th>
+                    <th>Purchased</th>
+                    <th>Used</th>
+                    <th>Closing</th>
+                    <th>Purchase ₹</th>
+                    <th>Usage ₹</th>
+                    <th>Stock Value ₹</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {history.map((r, i) => (
+                    <tr key={i}>
+                      <td>{r.date}</td>
+                      <td>{format2(r.openingStock)}</td>
+                      <td>{format2(r.purchased)}</td>
+                      <td>{format2(r.used)}</td>
+                      <td>{format2(r.closingStock)}</td>
+                      <td>₹ {formatMoney(r.purchaseAmount)}</td>
+                      <td>₹ {formatMoney(r.usageAmount)}</td>
+                      <td>₹ {formatMoney(r.stockValue)}</td>
+                    </tr>
+                  ))}
+
+                  {/* TOTAL ROW */}
+                  <tr style={{ fontWeight: "bold", background: "#e3f2fd" }}>
+                    <td>TOTAL</td>
+                    <td>{format2(totals.opening)}</td>
+                    <td>{format2(totals.purchased)}</td>
+                    <td>{format2(totals.used)}</td>
+                    <td>{format2(totals.closing)}</td>
+                    <td>₹ {formatMoney(totals.purchaseAmt)}</td>
+                    <td>₹ {formatMoney(totals.usageAmt)}</td>
+                    <td>₹ {formatMoney(totals.stockValue)}</td>
+                  </tr>
+                </tbody>
+
+              </table>
             </div>
-
-            <div className="box">
-              <span>Used</span>
-              <h3>{data.used}</h3>
-            </div>
-
-            <div className="box">
-              <span>Closing</span>
-              <h3>{data.closingStock}</h3>
-            </div>
-
-            <div className="box money">
-              <span>Purchase ₹</span>
-              <h3>{data.purchaseAmount?.toFixed(2)}</h3>
-            </div>
-
-            <div className="box money">
-              <span>Usage ₹</span>
-              <h3>{data.usageAmount?.toFixed(2)}</h3>
-            </div>
-
-            <div className="box total">
-              <span>Stock Value ₹</span>
-              <h2>{data.stockValue?.toFixed(2)}</h2>
-            </div>
-
-          </div>
+          )}
 
         </div>
       )}
-
     </div>
   );
 }

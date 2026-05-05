@@ -1,0 +1,83 @@
+/* Page background */
+.bin-page {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+/* Title */
+.bin-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Table container */
+.bin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Table header */
+.bin-table th {
+  background: #ff4d4d;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+/* Table rows */
+.bin-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Hover effect */
+.bin-table tr:hover {
+  background: #f9f9f9;
+}
+
+/* Restore button */
+.restore-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.restore-btn:hover {
+  background: #218838;
+}
+
+/* Empty state */
+.empty-bin {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+  font-size: 16px;
+}
+.deleteBtn {
+  background: #e53935;
+  color: white;
+  border: none;
+  margin-left: 12px;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.deleteBtn:hover {
+  background: #c62828;
+}

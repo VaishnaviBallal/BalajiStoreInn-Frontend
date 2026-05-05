@@ -63,6 +63,9 @@ function HomePage(){
     <button onClick={()=>navigate("/reports")}>
      Reports
     </button>
+    <button onClick={() => navigate("/bin")}>
+  🗑️ Recycle Bin
+</button>
 
    </div>
 
