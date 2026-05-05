@@ -18,7 +18,7 @@ function ItemsEntry({ items, setItems }) {
 
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:8080/products";
+  const API_URL = "https://balajirestaurant.onrender.com/products";
 
   const formatPrice = (value) => {
     return value ? Number(value).toFixed(2) : "0.00";
