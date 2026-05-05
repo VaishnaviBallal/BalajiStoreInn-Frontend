@@ -29,16 +29,16 @@ function ItemLookup() {
 
   const [allItems, setAllItems] = useState([]);
 
-  const SUMMARY_API = "http://localhost:8080/reports/item";
-  const DAYWISE_API = "http://localhost:8080/reports/item/daywise";
-  const PDF_API = "http://localhost:8080/reports/item/daywise/pdf";
+  const SUMMARY_API = "http://balajirestaurant.onrender.com/item";
+  const DAYWISE_API = "http://balajirestaurant.onrender.com/item/daywise";
+  const PDF_API = "http://balajirestaurant.onrender.com/item/daywise/pdf";
 
   /* =========================
      LOAD ALL ITEMS
   ========================= */
   useEffect(() => {
     axios
-      .get("http://localhost:8080/products")
+      .get("http://balajirestaurant.onrender.com/products")
       .then((res) => setAllItems(res.data || []))
       .catch(() => setAllItems([]));
   }, []);
