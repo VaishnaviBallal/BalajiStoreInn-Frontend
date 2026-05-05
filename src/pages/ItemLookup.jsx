@@ -38,7 +38,7 @@ function ItemLookup() {
   ========================= */
   useEffect(() => {
     axios
-      .get("http://balajirestaurant.onrender.com/products")
+      .get("https://balajirestaurant.onrender.com/products")
       .then((res) => setAllItems(res.data || []))
       .catch(() => setAllItems([]));
   }, []);

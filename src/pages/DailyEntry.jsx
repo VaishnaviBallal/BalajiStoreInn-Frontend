@@ -21,8 +21,8 @@ function DailyEntry() {
   const [price, setPrice] = useState("");
   const [editId, setEditId] = useState(null);
 
-  const ENTRY_API ="http://balajirestaurant.onrender.com/entries" ;
-  const ITEM_API = "http://balajirestaurant.onrender.com/products";
+  const ENTRY_API ="https://balajirestaurant.onrender.com/entries" ;
+  const ITEM_API = "https://balajirestaurant.onrender.com/products";
 
   const itemOptions = items.map(i => ({
     value: i.name,
