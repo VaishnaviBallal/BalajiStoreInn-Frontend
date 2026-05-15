@@ -7,6 +7,9 @@ import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+
 function DailyEntry() {
 
   const navigate = useNavigate();
@@ -21,7 +24,7 @@ function DailyEntry() {
   const [price, setPrice] = useState("");
   const [editId, setEditId] = useState(null);
 
-  const ENTRY_API ="https://balajirestaurant.onrender.com/entries" ;
+  const ENTRY_API = "https://balajirestaurant.onrender.com/entries";
   const ITEM_API = "https://balajirestaurant.onrender.com/products";
 
   const itemOptions = items.map(i => ({
@@ -29,57 +32,84 @@ function DailyEntry() {
     label: i.name
   }));
 
+  // LOAD DATA
   useEffect(() => {
-  loadItems();        // dropdown always loads
-  loadAllEntries();   // table shows all initially
-}, []);
-
-useEffect(() => {
-  if (date) {
-    loadEntriesByDate();
-  } else {
+    loadItems();
     loadAllEntries();
-  }
-}, [date]);
+  }, []);
 
- const loadEntries = async () => {
-  try {
-    const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
-    setEntries(res.data);
-  } catch (error) {
-    toast.error("Error loading entries");
-  }
-};
-const loadEntriesByDate = async () => {
-  try {
-    const res = await axios.get(`${ENTRY_API}/by-date?date=${date}`);
-    setEntries(res.data);
-  } catch (error) {
-    toast.error("Error loading entries");
-  }
-};
-
- const loadAllEntries = async () => {
-  try {
-    const res = await axios.get(`${ENTRY_API}/all`);
-    setEntries(res.data);
-  } catch (error) {
-    toast.error("Error loading all entries");
-  }
-};
-
-  const loadItems = async () => {
-    try {
-      const res = await axios.get(ITEM_API);
-      setItems(res.data);
-    } catch (error) {
-      toast.error("Error loading items");
+  // FILTER BY DATE
+  useEffect(() => {
+    if (date) {
+      loadEntriesByDate();
+    } else {
+      loadAllEntries();
     }
+  }, [date]);
+
+  // LOAD ENTRIES BY DATE
+  const loadEntriesByDate = async () => {
+
+    try {
+
+      const res = await axios.get(
+        `${ENTRY_API}/by-date?date=${date}`
+      );
+
+      setEntries(res.data);
+
+    } catch (error) {
+
+      toast.error("Error loading entries");
+
+    }
+
   };
 
+  // LOAD ALL ENTRIES
+  const loadAllEntries = async () => {
+
+    try {
+
+      const res = await axios.get(`${ENTRY_API}/all`);
+
+      setEntries(res.data);
+
+    } catch (error) {
+
+      toast.error("Error loading all entries");
+
+    }
+
+  };
+
+  // LOAD ITEMS
+  const loadItems = async () => {
+
+    try {
+
+      const res = await axios.get(ITEM_API);
+
+      setItems(res.data);
+
+    } catch (error) {
+
+      toast.error("Error loading items");
+
+    }
+
+  };
+
+  // SAVE ENTRY
   const saveEntry = async () => {
 
-    if (!date || !item || !type || !qty || (type === "purchase" && !price)) {
+    if (
+      !date ||
+      !item ||
+      !type ||
+      !qty ||
+      (type === "purchase" && !price)
+    ) {
       toast.warning("Please fill all fields");
       return;
     }
@@ -93,15 +123,26 @@ const loadEntriesByDate = async () => {
     };
 
     try {
+
+      // UPDATE
       if (editId) {
+
         await axios.put(`${ENTRY_API}/${editId}`, entry);
+
         toast.success("Entry updated");
-      } else {
-        await axios.post(ENTRY_API, entry);
-        toast.success("Entry saved");
+
       }
 
-      loadEntries();
+      // SAVE
+      else {
+
+        await axios.post(ENTRY_API, entry);
+
+        toast.success("Entry saved");
+
+      }
+
+      loadEntriesByDate();
 
       setItem("");
       setType("");
@@ -110,39 +151,102 @@ const loadEntriesByDate = async () => {
       setEditId(null);
 
     } catch (error) {
+
       toast.error("Error saving entry");
+
     }
+
   };
 
+  // DELETE ENTRY
   const deleteEntry = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
 
-    try {
-      await axios.delete(`${ENTRY_API}/${id}`);
-      setEntries(entries.filter(e => e.id !== id));
-      toast.success("Deleted");
-    } catch (error) {
-      toast.error("Error deleting");
+    const entryToDelete = entries.find(e => e.id === id);
+
+    if (!entryToDelete) {
+      toast.error("Entry not found");
+      return;
     }
+
+    confirmAlert({
+
+      title: "Confirm Delete",
+
+      message: `
+Date : ${entryToDelete.entryTime}
+
+Item : ${entryToDelete.itemName}
+
+Type : ${entryToDelete.type}
+
+Quantity : ${entryToDelete.quantity}
+
+Price : ₹ ${formatPrice(entryToDelete.price)}
+
+Total : ₹ ${formatPrice(entryToDelete.totalPrice)}
+      `,
+
+      buttons: [
+
+        {
+          label: "Yes",
+
+          onClick: async () => {
+
+            try {
+
+              await axios.delete(`${ENTRY_API}/${id}`);
+
+              setEntries(entries.filter(e => e.id !== id));
+
+              toast.success("Deleted successfully");
+
+            } catch (error) {
+
+              toast.error("Error deleting entry");
+
+            }
+
+          }
+        },
+
+        {
+          label: "No"
+        }
+
+      ]
+
+    });
+
   };
 
+  // EDIT ENTRY
   const editEntry = (entry) => {
+
     setItem(entry.itemName);
     setDate(entry.entryTime);
     setType(entry.type);
     setQty(entry.quantity);
     setPrice(entry.price);
     setEditId(entry.id);
+
+    toast.info("Editing entry");
+
   };
 
+  // FORMAT PRICE
   const formatPrice = (value) => {
     return value ? Number(value).toFixed(2) : "0.00";
   };
 
   return (
+
     <div className="page">
 
-      <button className="backBtn" onClick={() => navigate("/home")}>
+      <button
+        className="backBtn"
+        onClick={() => navigate("/home")}
+      >
         🏠 Home
       </button>
 
@@ -150,28 +254,41 @@ const loadEntriesByDate = async () => {
 
       <div className="form-box">
 
+        {/* DATE */}
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
 
-        {/* ✅ FIXED DROPDOWN WRAPPED IN DIV */}
-       <div className="item-select">
-  <Select
-    options={itemOptions}
-    value={itemOptions.find(o => o.value === item) || null}
-    onChange={(selected) => setItem(selected?.value || "")}
-    placeholder="Select Item"
-    isClearable
-  />
-</div>
-        <select value={type} onChange={(e) => setType(e.target.value)}>
+        {/* ITEM DROPDOWN */}
+        <div className="item-select">
+
+          <Select
+            options={itemOptions}
+            value={
+              itemOptions.find(o => o.value === item) || null
+            }
+            onChange={(selected) =>
+              setItem(selected?.value || "")
+            }
+            placeholder="Select Item"
+            isClearable
+          />
+
+        </div>
+
+        {/* TYPE */}
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+        >
           <option value="">Select Type</option>
           <option value="purchase">Purchase</option>
           <option value="usage">Usage</option>
         </select>
 
+        {/* QUANTITY */}
         <input
           type="number"
           placeholder="Quantity"
@@ -179,20 +296,29 @@ const loadEntriesByDate = async () => {
           onChange={(e) => setQty(e.target.value)}
         />
 
+        {/* PRICE */}
         {type === "purchase" && (
+
           <input
             type="number"
             placeholder="Price"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
           />
+
         )}
 
-        <button className="button" onClick={saveEntry}>
+        <button
+          className="button"
+          onClick={saveEntry}
+        >
           {editId ? "Update Entry" : "Save"}
         </button>
 
-        <button onClick={loadAllEntries} className="button">
+        <button
+          onClick={loadAllEntries}
+          className="button"
+        >
           Show All Entries
         </button>
 
@@ -216,8 +342,11 @@ const loadEntriesByDate = async () => {
         </thead>
 
         <tbody>
+
           {entries.map(e => (
+
             <tr key={e.id}>
+
               <td>{e.entryTime}</td>
               <td>{e.itemName}</td>
               <td>{e.type}</td>
@@ -226,22 +355,44 @@ const loadEntriesByDate = async () => {
               <td>₹ {formatPrice(e.totalPrice)}</td>
 
               <td>
-                <button className="edit-btn" onClick={() => editEntry(e)}>Edit</button>
+
+                <button
+                  className="edit-btn"
+                  onClick={() => editEntry(e)}
+                >
+                  Edit
+                </button>
+
               </td>
 
               <td>
-                <button className="delete-btn" onClick={() => deleteEntry(e.id)}>Delete</button>
+
+                <button
+                  className="delete-btn"
+                  onClick={() => deleteEntry(e.id)}
+                >
+                  Delete
+                </button>
+
               </td>
+
             </tr>
+
           ))}
+
         </tbody>
 
       </table>
 
-      <ToastContainer position="top-right" autoClose={2000} />
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+      />
 
     </div>
+
   );
+
 }
 
 export default DailyEntry;

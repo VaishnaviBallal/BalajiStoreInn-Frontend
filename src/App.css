@@ -380,3 +380,24 @@ h3{
 .item-select .css-1nmdiq5-menu {
   z-index: 9999;
 }
+.react-confirm-alert-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.react-confirm-alert-body {
+  width: 420px;
+  border-radius: 12px;
+  padding: 25px;
+  font-family: Arial;
+}
+
+.react-confirm-alert-button-group button {
+  background: #2c7be5;
+  border-radius: 6px;
+  border: none;
+  padding: 10px 18px;
+}
+
+.react-confirm-alert-button-group button:last-child {
+  background: red;
+}

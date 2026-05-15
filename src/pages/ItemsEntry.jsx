@@ -1,9 +1,13 @@
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { showSuccess, showError, showInfo } from "../utils/Toast";
-import "react-toastify/dist/ReactToastify.css";
+
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 function ItemsEntry({ items, setItems }) {
 
@@ -24,53 +28,56 @@ function ItemsEntry({ items, setItems }) {
     return value ? Number(value).toFixed(2) : "0.00";
   };
 
+  // ENTER KEY SAVE
   useEffect(() => {
 
-  const handleKeyDown = (e) => {
+    const handleKeyDown = (e) => {
 
-    if (e.key === "Enter") {
-      addItem();   // 🔥 triggers save/update
-    }
+      if (e.key === "Enter") {
+        addItem();
+      }
 
-  };
+    };
 
-  window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
 
-}, [itemName, unit, qty, price, editId]);
+  }, [itemName, unit, qty, price, editId]);
 
-  // 🔹 Load items
+  // LOAD ITEMS
   useEffect(() => {
+
     axios.get(API_URL)
       .then(res => setItems(res.data))
       .catch(err => {
         console.error(err);
-         toast.error("Failed to load items");
+        toast.error("Failed to load items");
       });
+
   }, [setItems]);
 
-  // 🔹 ADD / UPDATE
+  // ADD / UPDATE ITEM
   const addItem = () => {
 
     if (itemName.trim() === "" || unit === "" || qty === "" || price === "") {
-      showError("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     const trimmedName = itemName.trim().toLowerCase();
 
-    // 🔥 CHECK DUPLICATE
+    // CHECK DUPLICATE
     const exists = items.find(
       (item) =>
         item.name.trim().toLowerCase() === trimmedName &&
-        item.id !== editId   // 👈 IMPORTANT: allow same item when editing
+        item.id !== editId
     );
 
     if (exists) {
-       toast.error("Item already exists");
+      toast.error("Item already exists");
       return;
     }
 
@@ -81,8 +88,9 @@ function ItemsEntry({ items, setItems }) {
       price: Number(price)
     };
 
-    // ✏️ UPDATE
+    // UPDATE ITEM
     if (editId) {
+
       axios.put(`${API_URL}/${editId}`, itemData)
         .then(res => {
 
@@ -92,70 +100,134 @@ function ItemsEntry({ items, setItems }) {
 
           setItems(updated);
 
-           toast.success("Item updated successfully");
+          toast.success("Item updated successfully");
 
           resetForm();
 
         })
         .catch(err => {
+
           console.error(err);
-           toast.error("Error updating item");
+
+          toast.error("Error updating item");
+
         });
+
     }
 
-    // ➕ ADD
+    // ADD ITEM
     else {
+
       axios.post(API_URL, itemData)
         .then(res => {
 
           setItems([...items, res.data]);
 
-           toast.success("Item added successfully");
+          toast.success("Item added successfully");
 
           resetForm();
 
         })
         .catch(err => {
+
           console.error(err);
-           toast.error("Error adding item");
+
+          toast.error("Error adding item");
+
         });
+
     }
+
   };
 
-  // 🔹 RESET FORM
+  // RESET FORM
   const resetForm = () => {
+
     setItemName("");
     setUnit("");
     setQty("");
     setPrice("");
     setEditId(null);
+
   };
 
-  // 🔹 DELETE
+  // DELETE ITEM WITH CONFIRM ALERT
   const deleteItem = (id) => {
 
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    const itemToDelete = items.find(item => item.id === id);
 
-    axios.delete(`${API_URL}/${id}`)
-      .then(() => {
-        setItems(items.filter(item => item.id !== id));
-         toast.success("Item deleted successfully");
-      })
-      .catch(err => {
-        console.error(err);
-         toast.error("Error deleting item");
-      });
+    if (!itemToDelete) {
+      toast.error("Item not found");
+      return;
+    }
+
+    confirmAlert({
+
+      title: "Confirm Delete",
+
+      message: `
+Item Name : ${itemToDelete.name}
+
+Unit : ${itemToDelete.unit}
+
+Opening Qty : ${itemToDelete.quantity}
+
+Price Per Unit : ₹ ${formatPrice(itemToDelete.price)}
+
+Total Price : ₹ ${formatPrice(
+        itemToDelete.quantity * itemToDelete.price
+      )}
+
+Created Date : ${itemToDelete.createdDate}
+      `,
+
+      buttons: [
+
+        {
+          label: "Yes",
+
+          onClick: () => {
+
+            axios.delete(`${API_URL}/${id}`)
+              .then(() => {
+
+                setItems(items.filter(item => item.id !== id));
+
+                toast.success("Item deleted successfully");
+
+              })
+              .catch(err => {
+
+                console.error(err);
+
+                toast.error("Error deleting item");
+
+              });
+
+          }
+        },
+
+        {
+          label: "No"
+        }
+
+      ]
+
+    });
+
   };
 
-  // 🔹 EDIT BUTTON
+  // EDIT ITEM
   const editItem = (item) => {
+
     setItemName(item.name);
     setUnit(item.unit);
     setQty(item.quantity);
     setPrice(Number(item.price).toFixed(2));
     setEditId(item.id);
 
-     toast.info("Editing item");
+    toast.info("Editing item");
+
   };
 
   return (
@@ -167,15 +239,15 @@ function ItemsEntry({ items, setItems }) {
       </button>
 
       <h2>Items Entry</h2>
-      {/* Toast Container */}
-   <ToastContainer
-     position="top-right"
-     autoClose={2000}
-   />
+
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+      />
 
       <div className="form-box">
 
-        {/* 🔍 SEARCH */}
+        {/* SEARCH BOX */}
         <div style={{ position: "relative" }}>
 
           <input
@@ -199,6 +271,7 @@ function ItemsEntry({ items, setItems }) {
 
               setFilteredItems(filtered);
               setShowSuggestions(true);
+
             }}
             onFocus={() => {
               if (itemName) setShowSuggestions(true);
@@ -208,10 +281,13 @@ function ItemsEntry({ items, setItems }) {
             }}
           />
 
-          {/* Suggestions */}
+          {/* SUGGESTIONS */}
           {showSuggestions && filteredItems.length > 0 && (
+
             <div className="suggestions-box">
+
               {filteredItems.map((i) => (
+
                 <div
                   key={i.id}
                   className="suggestion-item"
@@ -226,13 +302,16 @@ function ItemsEntry({ items, setItems }) {
                     setShowSuggestions(false);
 
                     toast.info("Item already exists. Loaded for update.");
+
                   }}
                 >
                   {i.name}
                 </div>
+
               ))}
 
             </div>
+
           )}
 
         </div>
@@ -244,8 +323,8 @@ function ItemsEntry({ items, setItems }) {
           <option>Litre</option>
           <option>Gram</option>
           <option>Nos</option>
-           <option>Bottle</option>
-            <option>Packet</option>
+          <option>Bottle</option>
+          <option>Packet</option>
         </select>
 
         {/* QTY */}
@@ -296,6 +375,7 @@ function ItemsEntry({ items, setItems }) {
             {items.map((item) => (
 
               <tr key={item.id}>
+
                 <td>{item.createdDate}</td>
                 <td>{item.name}</td>
                 <td>{item.unit}</td>
@@ -332,8 +412,10 @@ function ItemsEntry({ items, setItems }) {
       </div>
 
     </div>
+
   );
 }
 
-
 export default ItemsEntry;
+
+
