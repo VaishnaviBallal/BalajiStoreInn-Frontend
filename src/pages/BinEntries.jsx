@@ -7,7 +7,7 @@ function BinEntries() {
  const navigate = useNavigate();
   const [binItems, setBinItems] = useState([]);
 
-  const API = "http://balajirestaurant.onrender.com/entries/bin";
+  const API = "https://balajirestaurant.onrender.com/entries/bin";
 
   useEffect(() => {
     loadBin();
@@ -25,14 +25,14 @@ function BinEntries() {
   if (!confirmDelete) return;
 
   await axios.delete(
-    `http://balajirestaurant.onrender.com/entries/permanent/${id}`
+    `https://balajirestaurant.onrender.com/entries/permanent/${id}`
   );
 
   loadBin();
 };
 
   const restoreItem = async (id) => {
-    await axios.put(`http://balajirestaurant.onrender.com/entries/restore/${id}`);
+    await axios.put(`https://balajirestaurant.onrender.com/entries/restore/${id}`);
     loadBin();
   };
 
