@@ -1,0 +1,54 @@
+.welcome-container {
+  height: 100vh;
+  background: linear-gradient(to right, #141e30, #243b55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: Arial;
+}
+
+.overlay {
+  text-align: center;
+}
+
+.main-title {
+  font-size: 55px;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 20px;
+  margin-bottom: 50px;
+  color: #ddd;
+}
+
+.card-container {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.welcome-card {
+  width: 300px;
+  padding: 40px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.welcome-card:hover {
+  transform: translateY(-10px);
+  background: rgba(255,255,255,0.2);
+}
+
+.welcome-card h2 {
+  margin-bottom: 15px;
+}
+
+.welcome-card p {
+  color: #eee;
+}

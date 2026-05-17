@@ -1,0 +1,41 @@
+.adminContainer {
+  padding: 20px;
+  font-family: Arial;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  background: #eee;
+  border-radius: 8px;
+}
+
+.orderCard {
+  background: white;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.orderCard.accepted {
+  border-left: 5px solid green;
+}
+
+.orderCard.history {
+  border-left: 5px solid gray;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 2px 0;
+}

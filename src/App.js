@@ -13,19 +13,23 @@ import Reports from "./pages/Reports";
 import ItemLookup from "./pages/ItemLookup";
 import BinEntries from "./pages/BinEntries";
 import MenuPage from "../src/Components/MenuPage";
+import CustomerMenu from "../src/pages/customer/CustomerMenu";
+import AdminOrdersPage from "../src/pages/customer/AdminOrderPage";
+import WelcomePage from "../src/pages/WelcomePage";
 
 function App() {
 
   const [items, setItems] = useState([]);
   const [entries, setEntries] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   return (
 
     <BrowserRouter>
 
       <Routes>
-
-        <Route path="/" element={<LoginPage />} />
+<Route path="/" element={<WelcomePage />} />
+<Route path="/login" element={<LoginPage />} />
 
         <Route path="/home" element={<HomePage />} />
         <Route path="/menu" element={<MenuPage />} />
@@ -56,6 +60,20 @@ function App() {
           element={<Reports entries={entries} />} 
         />
  <Route path="/bin" element={<BinEntries />} />
+
+ <Route
+  path="/customer-menu"
+  element={
+    <CustomerMenu
+      orders={orders}
+      setOrders={setOrders}
+    />
+  }
+/>
+<Route
+  path="/admin-orders"
+  element={<AdminOrdersPage orders={orders} />}
+/>
       </Routes>
      
 
