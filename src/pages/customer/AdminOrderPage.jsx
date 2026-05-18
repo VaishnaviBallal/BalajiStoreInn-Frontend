@@ -15,6 +15,7 @@ const navigate = useNavigate();
   const [newOrders, setNewOrders] = useState([]);
   const [acceptedOrders, setAcceptedOrders] = useState([]);
   const [historyOrders, setHistoryOrders] = useState([]);
+  const BASE_URL = "https://balajirestaurant.onrender.com";
 
   const [tab, setTab] = useState("NEW");
 
@@ -36,9 +37,7 @@ const navigate = useNavigate();
 
       console.log("📥 Loading Orders...");
 
-      const res = await axios.get(
-        "https://balajirestaurant.onrender.com/orders/all"
-      );
+      const res = await axios.get(`${BASE_URL}/orders/all`)
 
       const all = res.data;
 
@@ -72,7 +71,7 @@ const navigate = useNavigate();
     const client = new Client({
 
       webSocketFactory: () =>
-        new SockJS("https://balajirestaurant.onrender.com/ws"),
+       new SockJS(`${BASE_URL}/ws`),
 
       reconnectDelay: 3000,
 
@@ -168,9 +167,7 @@ const navigate = useNavigate();
 
       console.log("👉 ACCEPT ORDER:", id);
 
-      await axios.put(
-        `https://balajirestaurant.onrender.com/orders/${id}/accept`
-      );
+     await axios.put(`${BASE_URL}/orders/${id}/accept`)
 
       loadOrders();
 
@@ -189,10 +186,7 @@ const navigate = useNavigate();
 
       console.log("🍳 COMPLETE ORDER:", id);
 
-      await axios.put(
-        `https://balajirestaurant.onrender.com/orders/${id}/complete`
-      );
-
+    await axios.put(`${BASE_URL}/orders/${id}/complete`)
       loadOrders();
 
     } catch (err) {
@@ -214,9 +208,7 @@ const navigate = useNavigate();
           className="yesBtn"
           onClick={async () => {
             try {
-              await axios.delete(
-                `https://balajirestaurant.onrender.com/orders/${id}`
-              );
+             await axios.delete(`${BASE_URL}/orders/${id}`)
 
               toast.success("Order deleted");
               loadOrders();
@@ -255,9 +247,7 @@ const navigate = useNavigate();
           className="yesBtn"
           onClick={async () => {
             try {
-              await axios.delete(
-                "https://balajirestaurant.onrender.com/orders/history/clear"
-              );
+            await axios.delete(`${BASE_URL}/orders/history/clear`);
 
               toast.success("History cleared");
               
