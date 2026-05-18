@@ -62,7 +62,7 @@ function App() {
  <Route path="/bin" element={<BinEntries />} />
 
  <Route
-  path="/customer-menu"
+  path="/customer-menu/:tableNo"
   element={
     <CustomerMenu
       orders={orders}

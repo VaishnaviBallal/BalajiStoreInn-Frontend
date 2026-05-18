@@ -2,8 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import "../../styles/CustomerMenu.css";
+import { useParams } from "react-router-dom";
 
 function CustomerMenu() {
+
+  const { tableNo } = useParams();
 
   const clientRef = useRef(null);
   const sectionRefs = useRef({});
@@ -12,7 +15,8 @@ function CustomerMenu() {
   const [cart, setCart] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
- const menuItems = [
+  // ================= MENU =================
+  const menuItems = [
 
     // MOCKTAILS
     { id: 1, name: "Balaji Camel (Blue Lagoon)", price: 160, category: "Mocktails" },
@@ -194,12 +198,16 @@ function CustomerMenu() {
 
   ];
 
+  // IMPORTANT
   const categories = [...new Set(menuItems.map(i => i.category))];
 
-  // CONNECT WEBSOCKET
+  // ================= WEBSOCKET =================
   useEffect(() => {
+
     const client = new Client({
-      webSocketFactory: () => new SockJS("http://192.168.0.4:8080/ws"),
+      webSocketFactory: () =>
+       new SockJS("http://192.168.0.4:8080/ws"),
+
       reconnectDelay: 3000,
 
       onConnect: () => {
@@ -207,40 +215,66 @@ function CustomerMenu() {
         setConnected(true);
       },
 
-      onDisconnect: () => setConnected(false),
+      onDisconnect: () => {
+        setConnected(false);
+      }
     });
 
     client.activate();
     clientRef.current = client;
 
     return () => client.deactivate();
+
   }, []);
 
-  // ADD TO CART
+  // ================= ADD TO CART =================
   const addToCart = (item) => {
+
     const exist = cart.find(c => c.id === item.id);
 
     if (exist) {
-      setCart(cart.map(c =>
-        c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
-      ));
+
+      setCart(
+        cart.map(c =>
+          c.id === item.id
+            ? { ...c, quantity: c.quantity + 1 }
+            : c
+        )
+      );
+
     } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
+
+      setCart([
+        ...cart,
+        {
+          ...item,
+          quantity: 1
+        }
+      ]);
+
     }
   };
 
+  // ================= TOTAL =================
   const getTotal = () =>
-    cart.reduce((t, i) => t + i.price * i.quantity, 0);
+    cart.reduce(
+      (t, i) =>
+        typeof i.price === "number"
+          ? t + i.price * i.quantity
+          : t,
+      0
+    );
 
-  // PLACE ORDER
+  // ================= PLACE ORDER =================
   const placeOrder = () => {
+
     if (!clientRef.current?.connected) {
       alert("Server not connected");
       return;
     }
 
     const order = {
-      tableNo: 1,
+      tableNo: Number(tableNo),
       items: cart,
       total: getTotal(),
       status: "NEW"
@@ -252,46 +286,57 @@ function CustomerMenu() {
     });
 
     setCart([]);
-    alert("Order placed!");
+
+    alert("✅ Order placed!");
   };
 
-  // NEXT CATEGORY
+  // ================= NEXT CATEGORY =================
   const scrollToNext = () => {
+
     if (currentIndex < categories.length - 1) {
+
       const next = currentIndex + 1;
 
-      sectionRefs.current[categories[next]]?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      sectionRefs.current[categories[next]]
+        ?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
 
       setCurrentIndex(next);
     }
   };
 
-  // PREV CATEGORY
+  // ================= PREV CATEGORY =================
   const scrollToPrev = () => {
+
     if (currentIndex > 0) {
+
       const prev = currentIndex - 1;
 
-      sectionRefs.current[categories[prev]]?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      sectionRefs.current[categories[prev]]
+        ?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
 
       setCurrentIndex(prev);
     }
   };
 
-  // AUTO DETECT SCROLL POSITION
+  // ================= AUTO SCROLL DETECT =================
   useEffect(() => {
+
     const handleScroll = () => {
+
       let activeIndex = 0;
 
       categories.forEach((cat, index) => {
+
         const el = sectionRefs.current[cat];
 
         if (el) {
+
           const rect = el.getBoundingClientRect();
 
           if (rect.top <= window.innerHeight / 3) {
@@ -304,24 +349,38 @@ function CustomerMenu() {
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () =>
+      window.removeEventListener("scroll", handleScroll);
+
   }, [categories]);
 
+  // ================= UI =================
   return (
+
     <div className="customerMenu">
 
       {/* TOP BAR */}
       <div className="topBar">
         <h1>🍽 Balaji Inn</h1>
+        <p>Table No: {tableNo}</p>
       </div>
 
       {/* CATEGORY BAR */}
       <div className="categoryBar">
+
         {categories.map(cat => (
-          <a key={cat} href={`#${cat}`} className="categoryTab">
+
+          <a
+            key={cat}
+            href={`#${cat.replace(/\s+/g, "-")}`}
+            className="categoryTab"
+          >
             {cat}
           </a>
+
         ))}
+
       </div>
 
       <div className="menuContainer">
@@ -329,48 +388,87 @@ function CustomerMenu() {
         {/* MENU */}
         <div className="menuSection">
 
-          {categories.map((category) => (
+          {categories.map(category => (
+
             <div
               key={category}
-              id={category}
-              ref={(el) => (sectionRefs.current[category] = el)}
+              id={category.replace(/\s+/g, "-")}
+              ref={(el) =>
+                (sectionRefs.current[category] = el)
+              }
               className="categoryBlock"
             >
-              <h2 className="categoryTitle">{category}</h2>
+
+              <h2 className="categoryTitle">
+                {category}
+              </h2>
 
               <div className="foodGrid">
+
                 {menuItems
                   .filter(i => i.category === category)
                   .map(item => (
-                    <div key={item.id} className="foodCard">
+
+                    <div
+                      key={item.id}
+                      className="foodCard"
+                    >
+
                       <h3>{item.name}</h3>
-                      <p>₹{item.price}</p>
-                      <button onClick={() => addToCart(item)}>
+
+                      <p>
+                        {item.price === "APS"
+                          ? "Market Price"
+                          : `₹${item.price}`}
+                      </p>
+
+                      <button
+                        onClick={() => addToCart(item)}
+                      >
                         ADD
                       </button>
+
                     </div>
+
                   ))}
+
               </div>
+
             </div>
+
           ))}
 
         </div>
 
         {/* CART */}
         <div className="cartBox">
+
           <h2>🛒 Cart</h2>
 
+          {cart.length === 0 && (
+            <p>No items added</p>
+          )}
+
           {cart.map(c => (
-            <div key={c.id}>
+
+            <div
+              key={c.id}
+              className="cartItem"
+            >
               {c.name} × {c.quantity}
             </div>
+
           ))}
 
           <h3>Total: ₹{getTotal()}</h3>
 
-          <button className="placeOrderBtn" onClick={placeOrder}>
+          <button
+            className="placeOrderBtn"
+            onClick={placeOrder}
+          >
             Place Order
           </button>
+
         </div>
 
       </div>
@@ -379,15 +477,25 @@ function CustomerMenu() {
       <div className="arrowContainer">
 
         {currentIndex > 0 && (
-          <button className="upArrow" onClick={scrollToPrev}>
+
+          <button
+            className="upArrow"
+            onClick={scrollToPrev}
+          >
             ↑
           </button>
+
         )}
 
         {currentIndex < categories.length - 1 && (
-          <button className="downArrow" onClick={scrollToNext}>
+
+          <button
+            className="downArrow"
+            onClick={scrollToNext}
+          >
             ↓
           </button>
+
         )}
 
       </div>
