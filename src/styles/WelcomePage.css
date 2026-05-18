@@ -1,0 +1,68 @@
+.welcome-container {
+  height: 100vh;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: Arial;
+
+ background-size:contain;
+background-position: center;
+}
+
+.overlay {
+  text-align: center;
+}
+
+.main-title {
+  font-size: 50px;
+  margin-bottom: 20px;
+  color:rgb(26, 24, 24);
+}
+
+.subtitle {
+  font-size: 30px;
+  margin-bottom: 20px;
+  color: #b6f12d;
+}
+
+.card-container {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.welcome-card {
+  width: 300px;
+  padding: 40px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.welcome-card:hover {
+  transform: translateY(-10px);
+  background: rgba(255,255,255,0.2);
+}
+
+.welcome-card h2 {
+  margin-bottom: 15px;
+  color:white;
+}
+
+.welcome-card p {
+  color: #eee;
+}
+.balaji-card {
+  width: 800px;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  backdrop-filter: blur(20px);
+}

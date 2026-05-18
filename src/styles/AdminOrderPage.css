@@ -1,0 +1,258 @@
+body {
+  margin: 0;
+  background: #f4f6f9;
+  font-family: Arial, sans-serif;
+}
+
+/* MAIN */
+.adminContainer {
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* TITLE */
+.adminContainer h1 {
+  margin-bottom: 25px;
+  color: #222;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  border: none;
+  background: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.tabs button:hover {
+  transform: translateY(-2px);
+}
+
+.activeTab {
+  background: #ff5722 !important;
+  color: white;
+}
+
+/* CARD */
+.orderCard {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+}
+
+/* CARD TOP */
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* STATUS */
+.status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.newStatus {
+  background: #fff3cd;
+  color: #ff9800;
+}
+
+.acceptedStatus {
+  background: #d4edda;
+  color: green;
+}
+
+.historyStatus {
+  background: #e0e0e0;
+  color: #555;
+}
+
+/* ITEMS */
+.itemsBox {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 18px;
+}
+
+/* ITEM */
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.itemRow:last-child {
+  border-bottom: none;
+}
+
+/* BOTTOM */
+.bottomRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* BUTTONS */
+.acceptBtn {
+  background: #ff5722;
+  color: white;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.completeBtn {
+  background: green;
+  color: white;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.acceptBtn:hover,
+.completeBtn:hover {
+  opacity: 0.9;
+}
+
+/* EMPTY */
+.emptyText {
+  text-align: center;
+  margin-top: 50px;
+  color: #777;
+  font-size: 18px;
+}
+
+/* SPECIAL */
+.acceptedCard {
+  border-left: 6px solid green;
+}
+
+.historyCard {
+  border-left: 6px solid gray;
+}
+/* CLEAR HISTORY BUTTON */
+.clearHistoryBtn {
+  background: #ff3b30;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s ease;
+  box-shadow: 0 4px 10px rgba(255, 59, 48, 0.25);
+}
+
+.clearHistoryBtn:hover {
+  background: #e52e24;
+  transform: translateY(-2px);
+}
+
+.clearHistoryBtn:active {
+  transform: scale(0.98);
+}
+.enableSoundBtn{
+  background: #111;
+  color: rgb(32, 30, 30);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.enableSoundBtn:hover{
+  opacity: 0.9;
+}
+.adminHeaders{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 20px;
+  background:#252626;
+  color:white;
+  position:sticky;
+  top:0;
+}
+
+.backBtn{
+  background:#374151;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.enableSoundBtn{
+  background:#10b981;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.adminHeaders h1 {
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+.toastBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+.toastButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.yesBtn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.noBtn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
