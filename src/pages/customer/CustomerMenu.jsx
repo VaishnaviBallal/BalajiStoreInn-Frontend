@@ -3,6 +3,7 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import "../../styles/CustomerMenu.css";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function CustomerMenu() {
 
@@ -206,7 +207,7 @@ function CustomerMenu() {
 
     const client = new Client({
       webSocketFactory: () =>
-       new SockJS("http://192.168.0.4:8080/ws"),
+       new SockJS("https://balajirestaurant.onrender.com/ws"),
 
       reconnectDelay: 3000,
 
@@ -266,30 +267,34 @@ function CustomerMenu() {
     );
 
   // ================= PLACE ORDER =================
-  const placeOrder = () => {
+ const placeOrder = () => {
 
-    if (!clientRef.current?.connected) {
-      alert("Server not connected");
-      return;
-    }
+  if (cart.length === 0) {
+    toast.error("🛒 Cart is empty! Add items first");
+    return;
+  }
 
-    const order = {
-      tableNo: Number(tableNo),
-      items: cart,
-      total: getTotal(),
-      status: "NEW"
-    };
+  if (!clientRef.current?.connected) {
+    toast.error("❌ Server not connected");
+    return;
+  }
 
-    clientRef.current.publish({
-      destination: "/app/order",
-      body: JSON.stringify(order)
-    });
-
-    setCart([]);
-
-    alert("✅ Order placed!");
+  const order = {
+    tableNo: Number(tableNo),
+    items: cart,
+    total: getTotal(),
+    status: "NEW"
   };
 
+  clientRef.current.publish({
+    destination: "/app/order",
+    body: JSON.stringify(order)
+  });
+
+  setCart([]);
+
+  toast.success("✅ Order placed successfully!");
+};
   // ================= NEXT CATEGORY =================
   const scrollToNext = () => {
 
@@ -362,7 +367,7 @@ function CustomerMenu() {
 
       {/* TOP BAR */}
       <div className="topBar">
-        <h1>🍽 Balaji Inn</h1>
+        <h1>🍽 Balaji Inn Menu</h1>
         <p>Table No: {tableNo}</p>
       </div>
 
@@ -462,12 +467,13 @@ function CustomerMenu() {
 
           <h3>Total: ₹{getTotal()}</h3>
 
-          <button
-            className="placeOrderBtn"
-            onClick={placeOrder}
-          >
-            Place Order
-          </button>
+         <button
+  className="placeOrderBtn"
+  onClick={placeOrder}
+  disabled={cart.length === 0}
+>
+  Place Order
+</button>
 
         </div>
 

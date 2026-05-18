@@ -1,36 +1,57 @@
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 import "../../src/styles/WelcomePage.css";
+
+import bg from "../assets/login-bg.jpg";
 
 function WelcomePage() {
 
   const navigate = useNavigate();
 
+  // CUSTOMER CLICK
+  const handleCustomerClick = () => {
+
+    toast.info(
+      "📱 Please scan the QR code available on your table"
+    );
+  };
+
   return (
 
-    <div className="welcome-container">
+    <div
+      className="welcome-container"
+      style={{ backgroundImage: `url(${bg})` }}
+    >
 
       <div className="overlay">
 
-        <h1 className="main-title">
-          🍽 Balaji Inn
-        </h1>
+        {/* TITLE CARD */}
+        <div className="balaji-card">
 
-        <p className="subtitle">
-          Smart Restaurant Management System
-        </p>
+          <h1 className="main-title">
+            🍽 Balaji Inn
+          </h1>
 
+          <p className="subtitle">
+            Smart Restaurant Management System
+          </p>
+
+        </div>
+
+        {/* CARDS */}
         <div className="card-container">
 
           {/* CUSTOMER CARD */}
           <div
             className="welcome-card"
-            onClick={() => navigate("/customer-menu")}
+            onClick={handleCustomerClick}
           >
 
-            <h2>🍔 Order Food</h2>
+            <h2>📱 Scan Table QR</h2>
 
             <p>
-              Scan menu and place your order instantly
+              Scan your table QR code to view menu & place order
             </p>
 
           </div>

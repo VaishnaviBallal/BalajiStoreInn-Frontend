@@ -16,6 +16,7 @@ import MenuPage from "../src/Components/MenuPage";
 import CustomerMenu from "../src/pages/customer/CustomerMenu";
 import AdminOrdersPage from "../src/pages/customer/AdminOrderPage";
 import WelcomePage from "../src/pages/WelcomePage";
+import QrGeneratorPage from "../src/pages/customer/QrGeneratorPage";
 
 function App() {
 
@@ -30,7 +31,7 @@ function App() {
       <Routes>
 <Route path="/" element={<WelcomePage />} />
 <Route path="/login" element={<LoginPage />} />
-
+<Route path="/qr-generator" element={<QrGeneratorPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/menu" element={<MenuPage />} />
 
@@ -80,7 +81,7 @@ function App() {
 {/* ✅ Footer goes here */}
   
 
-      {/* Toast Notification System */}
+      
       <ToastContainer position="top-right" autoClose={2000} />
 
     </BrowserRouter>

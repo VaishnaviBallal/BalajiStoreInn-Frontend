@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import axios from "axios";
 import "../../styles/AdminOrderPage.css";
 import notificationSound from "../../assets/alert.mp3";
+import { toast } from "react-toastify";
 
 function AdminOrderPage() {
-
+const navigate = useNavigate();
   const clientRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -17,7 +19,7 @@ function AdminOrderPage() {
   const [tab, setTab] = useState("NEW");
 
   // =====================================
-  // AUDIO INIT
+  // INIT AUDIO
   // =====================================
   useEffect(() => {
 
@@ -26,7 +28,7 @@ function AdminOrderPage() {
   }, []);
 
   // =====================================
-  // LOAD INITIAL ORDERS
+  // LOAD ORDERS
   // =====================================
   const loadOrders = async () => {
 
@@ -35,12 +37,12 @@ function AdminOrderPage() {
       console.log("📥 Loading Orders...");
 
       const res = await axios.get(
-        "http://192.168.0.4:8080/orders/all"
+        "https://balajirestaurant.onrender.com/orders/all"
       );
 
       const all = res.data;
 
-      console.log("✅ Orders:", all);
+      console.log("✅ ORDERS:", all);
 
       setNewOrders(
         all.filter(o => o.status === "NEW")
@@ -70,7 +72,7 @@ function AdminOrderPage() {
     const client = new Client({
 
       webSocketFactory: () =>
-        new SockJS("http://192.168.0.4:8080/ws"),
+        new SockJS("https://balajirestaurant.onrender.com/ws"),
 
       reconnectDelay: 3000,
 
@@ -80,11 +82,13 @@ function AdminOrderPage() {
 
         client.subscribe("/topic/orders", (msg) => {
 
+          console.log("🔥 RAW MESSAGE:", msg);
+
           const order = JSON.parse(msg.body);
 
           console.log("📦 ORDER UPDATE:", order);
 
-          // 🔔 SOUND FOR NEW ORDER
+          // 🔔 PLAY SOUND ONLY FOR NEW ORDER
           if (order.status === "NEW") {
 
             if (audioRef.current) {
@@ -98,32 +102,21 @@ function AdminOrderPage() {
               });
             }
 
-            // BROWSER NOTIFICATION
+            // OPTIONAL BROWSER NOTIFICATION
             if (Notification.permission === "granted") {
 
-              new Notification("🍽 New Order", {
-                body: `Table ${order.tableNo} placed an order`
+              new Notification("🍽 New Order Received", {
+                body: `Table ${order.tableNo} placed order`,
               });
             }
-
-            // ADD NEW ORDER INSTANTLY
-            setNewOrders(prev => {
-
-              const exists = prev.some(
-                o => o.id === order.id
-              );
-
-              if (exists) return prev;
-
-              return [order, ...prev];
-            });
           }
+
+          loadOrders();
         });
       },
 
       onDisconnect: () => {
-
-        console.log("🔴 DISCONNECTED");
+        console.log("🔴 ADMIN DISCONNECTED");
       }
     });
 
@@ -136,7 +129,7 @@ function AdminOrderPage() {
   }, []);
 
   // =====================================
-  // ENABLE SOUND
+  // ENABLE NOTIFICATION PERMISSION
   // =====================================
   const enableSound = async () => {
 
@@ -156,7 +149,9 @@ function AdminOrderPage() {
         audioRef.current.currentTime = 0;
       }
 
-      alert("✅ Sound Enabled");
+      toast.success(
+      "📱 Sound Enabled"
+    );
 
     } catch (err) {
 
@@ -173,22 +168,11 @@ function AdminOrderPage() {
 
       console.log("👉 ACCEPT ORDER:", id);
 
-      const res = await axios.put(
-        `http://192.168.0.4:8080/orders/${id}/accept`
+      await axios.put(
+        `https://balajirestaurant.onrender.com/orders/${id}/accept`
       );
 
-      const updatedOrder = res.data;
-
-      // REMOVE FROM NEW
-      setNewOrders(prev =>
-        prev.filter(o => o.id !== id)
-      );
-
-      // ADD TO ACCEPTED
-      setAcceptedOrders(prev => [
-        updatedOrder,
-        ...prev
-      ]);
+      loadOrders();
 
     } catch (err) {
 
@@ -205,22 +189,11 @@ function AdminOrderPage() {
 
       console.log("🍳 COMPLETE ORDER:", id);
 
-      const res = await axios.put(
-        `http://192.168.0.4:8080/orders/${id}/complete`
+      await axios.put(
+        `https://balajirestaurant.onrender.com/orders/${id}/complete`
       );
 
-      const updatedOrder = res.data;
-
-      // REMOVE FROM ACCEPTED
-      setAcceptedOrders(prev =>
-        prev.filter(o => o.id !== id)
-      );
-
-      // ADD TO HISTORY
-      setHistoryOrders(prev => [
-        updatedOrder,
-        ...prev
-      ]);
+      loadOrders();
 
     } catch (err) {
 
@@ -229,56 +202,89 @@ function AdminOrderPage() {
   };
 
   // =====================================
-  // DELETE ORDER
+  // DELETE SINGLE ORDER
   // =====================================
-  const deleteOrder = async (id) => {
+  const deleteOrder = (id) => {
+  toast((t) => (
+    <div className="toastBox">
+      <p>🗑 Delete this order?</p>
 
-    const ok = window.confirm(
-      "Delete this order?"
-    );
+      <div className="toastButtons">
+        <button
+          className="yesBtn"
+          onClick={async () => {
+            try {
+              await axios.delete(
+                `https://balajirestaurant.onrender.com/orders/${id}`
+              );
 
-    if (!ok) return;
+              toast.success("Order deleted");
+              loadOrders();
+              toast.dismiss(t.id);
 
-    try {
+            } catch (err) {
+              toast.error("Delete failed");
+            }
+          }}
+        >
+          Yes
+        </button>
 
-      await axios.delete(
-        `http://192.168.0.4:8080/orders/${id}`
-      );
-
-      setHistoryOrders(prev =>
-        prev.filter(o => o.id !== id)
-      );
-
-    } catch (err) {
-
-      console.error("❌ DELETE ERROR:", err);
-    }
-  };
+        <button
+          className="noBtn" onClick={() => toast.dismiss(t.id)}>
+          No
+        </button>
+      </div>
+    </div>
+  ), {
+    closeOnClick: false,
+    autoClose: false
+  });
+};
 
   // =====================================
   // CLEAR HISTORY
   // =====================================
-  const clearHistory = async () => {
+  const clearHistory = () => {
+  toast((t) => (
+    <div className="toastBox">
+      <p>🧹 Clear all history?</p>
 
-    const ok = window.confirm(
-      "Clear all completed orders?"
-    );
+      <div className="toastButtons">
+        <button
+          className="yesBtn"
+          onClick={async () => {
+            try {
+              await axios.delete(
+                "https://balajirestaurant.onrender.com/orders/history/clear"
+              );
 
-    if (!ok) return;
+              toast.success("History cleared");
+              
+              loadOrders();
+              toast.dismiss(t.id);
 
-    try {
+            } catch (err) {
+              toast.error("Failed to clear");
+            }
+          }}
+        >
+          Yes
+        </button>
 
-      await axios.delete(
-        "http://192.168.0.4:8080/orders/history/clear"
-      );
-
-      setHistoryOrders([]);
-
-    } catch (err) {
-
-      console.error("❌ CLEAR ERROR:", err);
-    }
-  };
+        <button
+          className="noBtn"
+          onClick={() => toast.dismiss(t.id)}
+        >
+          No
+        </button>
+      </div>
+    </div>
+  ), {
+    autoClose: false,
+    closeOnClick: false
+  });
+};
 
   // =====================================
   // RENDER ITEMS
@@ -304,11 +310,11 @@ function AdminOrderPage() {
     <div className="adminContainer">
 
       {/* HEADER */}
-      <div className="adminHeader">
+      <div className="adminHeaders">
+<button className="backBtn" onClick={() => navigate("/home")} > ⬅ Back </button>
+        <h1>🍽 Balaji Inn Orders</h1>
 
-        <h1>🍽 Balaji Inn Admin</h1>
-
-       
+       <button className="enableSoundBtn" onClick={enableSound} > 🔊 Enable Sound </button>
 
       </div>
 
@@ -335,16 +341,11 @@ function AdminOrderPage() {
         >
           📜 History ({historyOrders.length})
         </button>
-         <button
-          className="enableSoundBtn"
-          onClick={enableSound}
-        >
-          🔊 Enable Sound
-        </button>
+         
 
       </div>
 
-      {/* NEW ORDERS */}
+      {/* NEW */}
       {tab === "NEW" && (
 
         <div className="ordersGrid">

@@ -1,11 +1,14 @@
 .welcome-container {
   height: 100vh;
-  background: linear-gradient(to right, #141e30, #243b55);
+  
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
   font-family: Arial;
+
+ background-size:contain;
+background-position: center;
 }
 
 .overlay {
@@ -13,14 +16,15 @@
 }
 
 .main-title {
-  font-size: 55px;
-  margin-bottom: 10px;
+  font-size: 50px;
+  margin-bottom: 20px;
+  color:rgb(26, 24, 24);
 }
 
 .subtitle {
-  font-size: 20px;
-  margin-bottom: 50px;
-  color: #ddd;
+  font-size: 30px;
+  margin-bottom: 20px;
+  color: #b6f12d;
 }
 
 .card-container {
@@ -47,8 +51,18 @@
 
 .welcome-card h2 {
   margin-bottom: 15px;
+  color:white;
 }
 
 .welcome-card p {
   color: #eee;
+}
+.balaji-card {
+  width: 800px;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  backdrop-filter: blur(20px);
 }

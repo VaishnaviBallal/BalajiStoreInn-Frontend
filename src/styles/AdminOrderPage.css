@@ -191,3 +191,68 @@ body {
 .enableSoundBtn:hover{
   opacity: 0.9;
 }
+.adminHeaders{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 20px;
+  background:#252626;
+  color:white;
+  position:sticky;
+  top:0;
+}
+
+.backBtn{
+  background:#374151;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.enableSoundBtn{
+  background:#10b981;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.adminHeaders h1 {
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+.toastBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+.toastButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.yesBtn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.noBtn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
