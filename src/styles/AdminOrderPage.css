@@ -177,16 +177,7 @@ body {
 .clearHistoryBtn:active {
   transform: scale(0.98);
 }
-.enableSoundBtn{
-  background: #111;
-  color: rgb(32, 30, 30);
-  border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-}
+
 
 .enableSoundBtn:hover{
   opacity: 0.9;
@@ -255,4 +246,18 @@ body {
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
+}
+.Toastify__toast-container {
+  z-index: 99999 !important;
+}
+
+.Toastify__toast {
+  z-index: 99999 !important;
+}
+.adminContainer,
+.adminHeaders,
+.tabs,
+.orderCard {
+  position: relative;
+  z-index: 1;
 }
