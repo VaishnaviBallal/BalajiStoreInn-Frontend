@@ -89,17 +89,21 @@ const navigate = useNavigate();
 
           // 🔔 PLAY SOUND ONLY FOR NEW ORDER
           if (order.status === "NEW") {
+  try {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
 
-            if (audioRef.current) {
+      const playPromise = audioRef.current.play();
 
-              audioRef.current.currentTime = 0;
-
-              audioRef.current.play().catch(err => {
-
-                console.log("🔇 AUDIO BLOCKED:", err);
-
-              });
-            }
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.log("🔇 Mobile blocked sound:", err);
+        });
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
 
             // OPTIONAL BROWSER NOTIFICATION
             if (Notification.permission === "granted") {
@@ -131,33 +135,25 @@ const navigate = useNavigate();
   // ENABLE NOTIFICATION PERMISSION
   // =====================================
   const enableSound = async () => {
-
-    try {
-
-      if (Notification.permission !== "granted") {
-
-        await Notification.requestPermission();
-      }
-
-      if (audioRef.current) {
-
-        await audioRef.current.play();
-
-        audioRef.current.pause();
-
-        audioRef.current.currentTime = 0;
-      }
-
-      toast.success(
-      "📱 Sound Enabled"
-    );
-
-    } catch (err) {
-
-      console.log(err);
+  try {
+    if (Notification.permission !== "granted") {
+      await Notification.requestPermission();
     }
-  };
 
+    if (audioRef.current) {
+      audioRef.current.muted = false;
+      audioRef.current.volume = 1;
+
+      await audioRef.current.play();
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    toast.success("📱 Sound Enabled");
+  } catch (err) {
+    console.log("Unlock failed:", err);
+  }
+};
   // =====================================
   // ACCEPT ORDER
   // =====================================
