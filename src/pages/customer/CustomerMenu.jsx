@@ -228,6 +228,45 @@ function CustomerMenu() {
 
   }, []);
 
+  const increaseQty = (item) => {
+  const exist = cart.find(c => c.id === item.id);
+
+  if (exist) {
+    setCart(
+      cart.map(c =>
+        c.id === item.id
+          ? { ...c, quantity: c.quantity + 1 }
+          : c
+      )
+    );
+  } else {
+    setCart([...cart, { ...item, quantity: 1 }]);
+  }
+};
+
+const decreaseQty = (item) => {
+  const exist = cart.find(c => c.id === item.id);
+
+  if (!exist) return;
+
+  if (exist.quantity === 1) {
+    setCart(cart.filter(c => c.id !== item.id));
+  } else {
+    setCart(
+      cart.map(c =>
+        c.id === item.id
+          ? { ...c, quantity: c.quantity - 1 }
+          : c
+      )
+    );
+  }
+};
+
+const getItemQty = (id) => {
+  const item = cart.find(c => c.id === id);
+  return item ? item.quantity : 0;
+};
+
   // ================= ADD TO CART =================
   const addToCart = (item) => {
 
@@ -427,11 +466,15 @@ function CustomerMenu() {
                           : `₹${item.price}`}
                       </p>
 
-                      <button
-                        onClick={() => addToCart(item)}
-                      >
-                        ADD
-                      </button>
+                      <div className="qtyControls">
+
+  <button onClick={() => decreaseQty(item)}>-</button>
+
+  <span>{getItemQty(item.id)}</span>
+
+  <button onClick={() => increaseQty(item)}>+</button>
+
+</div>
 
                     </div>
 

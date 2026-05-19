@@ -1,8 +1,11 @@
 .home-container {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: #f4f7fb;
   padding: 30px;
   font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .top-bar {

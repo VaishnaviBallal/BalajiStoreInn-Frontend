@@ -113,7 +113,7 @@ h2 {
 ========================= */
 .search-card {
   width: 32%;
-  min-width: 320px;
+  min-width: 0;
   padding: 20px;
   border-radius: 14px;
   background: #ffffff;
@@ -188,16 +188,53 @@ h2 {
   border-bottom: 1px solid #ddd;
 }
 
-/* =========================
-   MOBILE
-========================= */
-@media (max-width: 1100px) {
-  .result-layout {
-    flex-direction: column;
+@media (max-width: 768px) {
+
+  .page {
+    padding: 12px;
   }
 
-  .search-card,
-  .history-table {
+  .search-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-box input {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .search-box button {
+    width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .downloadBtn {
+    margin-left: 0;
+  }
+
+  .dropdown {
     width: 100%;
   }
+
+  
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .total {
+    grid-column: span 1;
+  }
+
+  .history-table {
+    padding: 10px;
+  }
+
+  .history-table table {
+    min-width: 600px;
+  }
+
 }

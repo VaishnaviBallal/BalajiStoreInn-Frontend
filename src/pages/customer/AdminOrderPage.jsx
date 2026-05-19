@@ -209,10 +209,13 @@ const navigate = useNavigate();
           onClick={async () => {
             try {
              await axios.delete(`${BASE_URL}/orders/${id}`)
-
+ toast.dismiss(t.id);
               toast.success("Order deleted");
-              loadOrders();
-              toast.dismiss(t.id);
+              setTimeout(() => {
+  window.location.reload();
+}, 1500);
+              
+             
 
             } catch (err) {
               toast.error("Delete failed");
@@ -248,11 +251,13 @@ const navigate = useNavigate();
           onClick={async () => {
             try {
             await axios.delete(`${BASE_URL}/orders/history/clear`);
-
+ toast.dismiss(t.id);
               toast.success("History cleared");
-              
-              loadOrders();
-              toast.dismiss(t.id);
+              setTimeout(() => {
+  window.location.reload();
+}, 1500);
+             
+             
 
             } catch (err) {
               toast.error("Failed to clear");
