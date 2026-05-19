@@ -71,6 +71,9 @@ function AdminOrderPage() {
           const order = JSON.parse(msg.body);
 
           if (order.status === "NEW") {
+            toast.info(`🍽 New Order - Table ${order.tableNo}`);
+
+navigator.vibrate?.(200);
 
             // 🔊 SOUND
             try {
