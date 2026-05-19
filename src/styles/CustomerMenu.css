@@ -22,7 +22,7 @@
 .categoryBar {
   display: flex;
   overflow-x: auto;
-  gap: 10px;
+  gap: 3px;
   padding: 12px;
   background: white;
 
@@ -30,13 +30,16 @@
   top: 68px;
   left: 0;
   width: 100%;
-
   z-index: 998;
 
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 
   scrollbar-width: none;
+
+  scroll-snap-type: x mandatory; /* ✅ KEY */
+  scroll-behavior: smooth;
 }
+
 /* MAIN */
 .menuContainer {
   display: flex;
@@ -59,11 +62,18 @@
   text-decoration: none;
   color: #333;
   font-size: 14px;
+   scroll-snap-align: start; /* ✅ KEY */
+  transition: 0.2s;
 }
 
 .categoryTab:hover {
   background: #ff3d00;
   color: white;
+}
+.categoryTab.activeTab {
+  background: #ff3d00;
+  color: white;
+  transform: scale(1.05);
 }
 
 /* MAIN */
@@ -236,31 +246,64 @@
 }
 @media (max-width: 768px) {
 
-  .menuContainer {
-    flex-direction: column;
-    padding-bottom: 160px; /* space for cart */
-  }
+ .menuContainer {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  margin-top: 130px;
+  align-items: flex-start;
+}
 
   .cartBox {
     position: fixed;
     left: 0;
+    right: 0;   /* ✅ IMPORTANT */
     bottom: 0;
 
     width: 100%;
+
+    margin: 0;   /* ✅ remove gaps */
+    padding: 14px;
 
     background: white;
     z-index: 9999;
 
     border-radius: 18px 18px 0 0;
 
-    padding: 12px;
-
     box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
 
-    max-height: 160px;
+    max-height: 55vh;
     overflow-y: auto;
+
+    box-sizing: border-box; /* ✅ prevents shrink issue */
   }
 }
+  @media (max-width: 768px) {
+
+  .foodGrid {
+    grid-template-columns: 1fr; /* full width cards */
+    gap: 12px;
+  }
+
+  .foodCard {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .foodCard h3 {
+    font-size: 16px;
+  }
+
+  .foodCard p {
+    font-size: 14px;
+  }
+
+  .foodCard button {
+    padding: 10px;
+    font-size: 15px;
+  }
+}
+
 
 .qtyControls {
   display: flex;
