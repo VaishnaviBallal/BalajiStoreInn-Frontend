@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import "../styles/ItemsEntry.css"
 
 function ItemsEntry({ items, setItems }) {
 
@@ -63,7 +64,7 @@ function ItemsEntry({ items, setItems }) {
   const addItem = () => {
 
     if (itemName.trim() === "" || unit === "" || qty === "" || price === "") {
-      toast.error("Please fill all fields");
+      toast.warning("Please fill all fields");
       return;
     }
 

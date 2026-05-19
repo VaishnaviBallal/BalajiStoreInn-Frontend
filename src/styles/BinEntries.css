@@ -14,7 +14,10 @@
   color: #333;
 }
 
-/* Table container */
+/* TABLE WRAPPER (IMPORTANT FOR MOBILE) */
+
+
+/* Table */
 .bin-table {
   width: 100%;
   border-collapse: collapse;
@@ -24,7 +27,7 @@
   overflow: hidden;
 }
 
-/* Table header */
+/* Header */
 .bin-table th {
   background: #ff4d4d;
   color: white;
@@ -33,7 +36,7 @@
   font-size: 14px;
 }
 
-/* Table rows */
+/* Rows */
 .bin-table td {
   padding: 12px;
   border-bottom: 1px solid #eee;
@@ -41,12 +44,32 @@
   color: #333;
 }
 
-/* Hover effect */
+/* Hover */
 .bin-table tr:hover {
   background: #f9f9f9;
 }
 
-/* Restore button */
+/* EMPTY */
+.empty-bin {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+  font-size: 16px;
+}
+
+/* ACTION CELL */
+/* WRAPPER FOR MOBILE SCROLL */
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ACTION CELL */
+.actionCell {
+  white-space: nowrap;
+}
+
+/* BUTTONS */
 .restore-btn {
   background: #28a745;
   color: white;
@@ -54,30 +77,70 @@
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
+  margin-right: 6px;
 }
 
-.restore-btn:hover {
-  background: #218838;
-}
-
-/* Empty state */
-.empty-bin {
-  text-align: center;
-  padding: 30px;
-  color: #888;
-  font-size: 16px;
-}
 .deleteBtn {
   background: #e53935;
   color: white;
   border: none;
-  margin-left: 12px;
   padding: 6px 10px;
   cursor: pointer;
   border-radius: 4px;
 }
 
-.deleteBtn:hover {
-  background: #c62828;
+/* TOAST UI */
+.toastBox {
+  padding: 10px;
+}
+
+.toastButtons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.yesBtn {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+.noBtn {
+  background: #777;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .bin-table th,
+  .bin-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  @media (max-width: 768px) {
+  .actionCell {
+    display: flex;
+    flex-direction: row;   /* IMPORTANT FIX */
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .restore-btn,
+  .deleteBtn {
+    font-size: 11px;
+    padding: 6px 8px;
+    flex: 1;
+  }
+}
+}
+.actionCell {
+  white-space: normal;
+  min-width: 140px;
 }

@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "../styles/ItemSearch.css";
 
 /* =========================
@@ -44,7 +48,7 @@ function ItemLookup() {
   }, []);
 
   /* =========================
-     LOCAL FILTER (NO API)
+     LOCAL FILTER
   ========================= */
   useEffect(() => {
     if (search.trim() === "") {
@@ -72,7 +76,10 @@ function ItemLookup() {
      SEARCH API
   ========================= */
   const searchItem = async (itemName) => {
-    if (!itemName || !itemName.trim()) return;
+    if (!itemName || !itemName.trim()) {
+      toast.warn("Please enter item name");
+      return;
+    }
 
     try {
       setShowDropdown(false);
@@ -84,11 +91,16 @@ function ItemLookup() {
 
       setData(summaryRes.data);
       setHistory(historyRes.data || []);
+
+      if (!summaryRes.data) {
+        toast.error("Item not found");
+      }
+
     } catch (err) {
       console.error(err);
       setData(null);
       setHistory([]);
-      alert("Item not found");
+      toast.error("Item not found or server error");
     }
   };
 
@@ -96,20 +108,24 @@ function ItemLookup() {
      ENTER KEY
   ========================= */
   const handleKeyDown = (e) => {
-    if (e.key !== "Enter") return;
-    searchItem(search);
+    if (e.key === "Enter") {
+      searchItem(search);
+    }
   };
 
   /* =========================
      PDF DOWNLOAD
   ========================= */
   const downloadPdf = () => {
-    if (!data) return;
+    if (!data) {
+      toast.warn("No data to download");
+      return;
+    }
     window.open(`${PDF_API}?name=${data.itemName}`, "_blank");
   };
 
   /* =========================
-     TOTAL CALCULATION
+     TOTALS
   ========================= */
   const totals = history.reduce(
     (acc, r) => {
@@ -135,6 +151,10 @@ function ItemLookup() {
 
   return (
     <div className="page">
+
+      {/* TOAST CONTAINER */}
+      <ToastContainer position="top-right" autoClose={2000} />
+
       <button className="backBtn" onClick={() => navigate("/home")}>
         🏠 Home
       </button>
@@ -143,11 +163,11 @@ function ItemLookup() {
 
       {/* SEARCH */}
       <div className="search-box">
+
         <input
           type="text"
           placeholder="Type item name..."
           value={search}
-          autoComplete="off"
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleKeyDown}
         />
@@ -157,7 +177,6 @@ function ItemLookup() {
         <button
           className="downloadBtn"
           onClick={downloadPdf}
-          disabled={!data}
         >
           Download PDF
         </button>
@@ -181,48 +200,16 @@ function ItemLookup() {
         )}
       </div>
 
+      {/* RESULTS */}
       {(data || history.length > 0) && (
         <div className="result-layout">
 
-          {/* SUMMARY */}
           {data && (
             <div className="search-card">
               <h2 className="item-title">{data.itemName}</h2>
-
-              <div className="grid">
-                <div className="box">
-                  <span>Opening</span>
-                  <h3>{format2(data.openingStock)}</h3>
-                </div>
-                <div className="box">
-                  <span>Purchased</span>
-                  <h3>{format2(data.purchased)}</h3>
-                </div>
-                <div className="box">
-                  <span>Used</span>
-                  <h3>{format2(data.used)}</h3>
-                </div>
-                <div className="box">
-                  <span>Closing</span>
-                  <h3>{format2(data.closingStock)}</h3>
-                </div>
-                <div className="box money">
-                  <span>Purchase ₹</span>
-                  <h3>{formatMoney(data.purchaseAmount)}</h3>
-                </div>
-                <div className="box money">
-                  <span>Usage ₹</span>
-                  <h3>{formatMoney(data.usageAmount)}</h3>
-                </div>
-                <div className="box total">
-                  <span>Stock Value ₹</span>
-                  <h2>{formatMoney(data.stockValue)}</h2>
-                </div>
-              </div>
             </div>
           )}
 
-          {/* TABLE */}
           {history.length > 0 && (
             <div className="history-table">
               <h2>Daywise Report</h2>
@@ -254,18 +241,6 @@ function ItemLookup() {
                       <td>₹ {formatMoney(r.stockValue)}</td>
                     </tr>
                   ))}
-
-                  {/* TOTAL ROW */}
-                  <tr style={{ fontWeight: "bold", background: "#e3f2fd" }}>
-                    <td>TOTAL</td>
-                    <td>{format2(totals.opening)}</td>
-                    <td>{format2(totals.purchased)}</td>
-                    <td>{format2(totals.used)}</td>
-                    <td>{format2(totals.closing)}</td>
-                    <td>₹ {formatMoney(totals.purchaseAmt)}</td>
-                    <td>₹ {formatMoney(totals.usageAmt)}</td>
-                    <td>₹ {formatMoney(totals.stockValue)}</td>
-                  </tr>
                 </tbody>
 
               </table>
@@ -274,6 +249,7 @@ function ItemLookup() {
 
         </div>
       )}
+
     </div>
   );
 }
