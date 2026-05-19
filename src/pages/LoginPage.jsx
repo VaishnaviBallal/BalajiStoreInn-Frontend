@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState,useEffect } from "react";
 import "../styles/Login.css";
 
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import bg from "../assets/login-bg.jpg";
 
@@ -84,11 +84,7 @@ style={{ backgroundImage: `url(${bg})` }}>
 
    </div>
 
-   {/* Toast Container */}
-   <ToastContainer
-     position="top-right"
-     autoClose={2000}
-   />
+ 
 
   </div>
 

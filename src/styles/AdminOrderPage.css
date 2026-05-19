@@ -247,13 +247,7 @@ body {
   border-radius: 6px;
   cursor: pointer;
 }
-.Toastify__toast-container {
-  z-index: 99999 !important;
-}
 
-.Toastify__toast {
-  z-index: 99999 !important;
-}
 .adminContainer,
 .adminHeaders,
 .tabs,

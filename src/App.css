@@ -401,3 +401,7 @@ h3{
 .react-confirm-alert-button-group button:last-child {
   background: red;
 }
+
+.Toastify_toast{
+  pointer-events:auto !important;
+}
