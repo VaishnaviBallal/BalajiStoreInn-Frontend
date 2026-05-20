@@ -36,7 +36,7 @@ function ItemLookup() {
 
   const SUMMARY_API = "https://balajirestaurant.onrender.com/item";
   const DAYWISE_API = "https://balajirestaurant.onrender.com/item/daywise";
-  const PDF_API = "https://balajirestaurant.onrender.com/item/daywise/pdf";
+  const PDF_API = "https://balajirestaurant.onrender.com/reports/item/daywise/pdf";
 
   /* =========================
      LOAD ALL ITEMS

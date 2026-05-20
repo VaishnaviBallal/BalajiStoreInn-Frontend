@@ -239,6 +239,12 @@ h2 {
 
 }
 .total-row {
-  background: #f1f1f1;
+  background: #ffe8cc;
   font-weight: bold;
+  position: sticky;
+  bottom: 0;
+}
+
+.total-row td {
+  border-top: 2px solid #ff9800;
 }
