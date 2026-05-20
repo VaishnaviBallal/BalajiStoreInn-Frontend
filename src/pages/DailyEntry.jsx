@@ -19,6 +19,7 @@ function DailyEntry() {
 
   const [date, setDate] = useState("");
   const [item, setItem] = useState("");
+  const [productId, setProductId] = useState("");
   const [type, setType] = useState("");
   const [qty, setQty] = useState("");
   const [price, setPrice] = useState("");
@@ -28,7 +29,7 @@ function DailyEntry() {
   const ITEM_API = "https://balajirestaurant.onrender.com/products";
 
   const itemOptions = items.map(i => ({
-    value: i.name,
+    value: i.id,
     label: i.name
   }));
 
@@ -106,6 +107,7 @@ function DailyEntry() {
     if (
       !date ||
       !item ||
+      !productId ||
       !type ||
       !qty ||
       (type === "purchase" && !price)
@@ -115,11 +117,22 @@ function DailyEntry() {
     }
 
     const entry = {
+
+      productId: productId,
+
       itemName: item,
-      type,
+
+      type: type,
+
       quantity: Number(qty),
-      price: type === "purchase" ? Number(price) : 0,
+
+      price:
+        type === "purchase"
+          ? Number(price)
+          : 0,
+
       entryTime: date
+
     };
 
     try {
@@ -145,6 +158,7 @@ function DailyEntry() {
       loadEntriesByDate();
 
       setItem("");
+      setProductId("");
       setType("");
       setQty("");
       setPrice("");
@@ -224,6 +238,7 @@ Total : ₹ ${formatPrice(entryToDelete.totalPrice)}
   const editEntry = (entry) => {
 
     setItem(entry.itemName);
+    setProductId(entry.productId);
     setDate(entry.entryTime);
     setType(entry.type);
     setQty(entry.quantity);
@@ -267,11 +282,15 @@ Total : ₹ ${formatPrice(entryToDelete.totalPrice)}
           <Select
             options={itemOptions}
             value={
-              itemOptions.find(o => o.value === item) || null
+              itemOptions.find(o => o.value === productId) || null
             }
-            onChange={(selected) =>
-              setItem(selected?.value || "")
-            }
+            onChange={(selected) => {
+
+              setProductId(selected?.value || "");
+
+              setItem(selected?.label || "");
+
+            }}
             placeholder="Select Item"
             isClearable
           />

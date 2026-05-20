@@ -33,6 +33,7 @@ function ItemLookup() {
 
   const [allItems, setAllItems] = useState([]);
 
+
   const SUMMARY_API = "https://balajirestaurant.onrender.com/item";
   const DAYWISE_API = "https://balajirestaurant.onrender.com/item/daywise";
   const PDF_API = "https://balajirestaurant.onrender.com/item/daywise/pdf";
@@ -48,7 +49,7 @@ function ItemLookup() {
   }, []);
 
   /* =========================
-     LOCAL FILTER
+     LOCAL FILTER (FIXED)
   ========================= */
   useEffect(() => {
     if (search.trim() === "") {
@@ -65,11 +66,7 @@ function ItemLookup() {
 
     setSuggestions(filtered);
 
-    const exactMatch = filtered.some(
-      (name) => name.toLowerCase() === search.toLowerCase()
-    );
-
-    setShowDropdown(!exactMatch && filtered.length > 0);
+    setShowDropdown(filtered.length > 0);
   }, [search, allItems]);
 
   /* =========================
@@ -95,7 +92,6 @@ function ItemLookup() {
       if (!summaryRes.data) {
         toast.error("Item not found");
       }
-
     } catch (err) {
       console.error(err);
       setData(null);
@@ -123,36 +119,44 @@ function ItemLookup() {
     }
     window.open(`${PDF_API}?name=${data.itemName}`, "_blank");
   };
+  const totalOpening = history.reduce(
+  (sum, r) => sum + toNumber(r.openingStock),
+  0
+);
 
-  /* =========================
-     TOTALS
-  ========================= */
-  const totals = history.reduce(
-    (acc, r) => {
-      acc.opening += Number(r.openingStock || 0);
-      acc.purchased += Number(r.purchased || 0);
-      acc.used += Number(r.used || 0);
-      acc.closing += Number(r.closingStock || 0);
-      acc.purchaseAmt += Number(r.purchaseAmount || 0);
-      acc.usageAmt += Number(r.usageAmount || 0);
-      acc.stockValue += Number(r.stockValue || 0);
-      return acc;
-    },
-    {
-      opening: 0,
-      purchased: 0,
-      used: 0,
-      closing: 0,
-      purchaseAmt: 0,
-      usageAmt: 0,
-      stockValue: 0,
-    }
-  );
+const totalPurchased = history.reduce(
+  (sum, r) => sum + toNumber(r.purchased),
+  0
+);
+
+const totalUsed = history.reduce(
+  (sum, r) => sum + toNumber(r.used),
+  0
+);
+
+const totalClosing = history.reduce(
+  (sum, r) => sum + toNumber(r.closingStock),
+  0
+);
+
+const totalPurchaseAmount = history.reduce(
+  (sum, r) => sum + toNumber(r.purchaseAmount),
+  0
+);
+
+const totalUsageAmount = history.reduce(
+  (sum, r) => sum + toNumber(r.usageAmount),
+  0
+);
+
+const totalStockValue = history.reduce(
+  (sum, r) => sum + toNumber(r.stockValue),
+  0
+);
 
   return (
     <div className="page">
 
-      {/* TOAST CONTAINER */}
       <ToastContainer position="top-right" autoClose={2000} />
 
       <button className="backBtn" onClick={() => navigate("/home")}>
@@ -165,33 +169,44 @@ function ItemLookup() {
       <div className="search-box">
 
         <input
-          type="text"
-          placeholder="Type item name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
+  type="text"
+  placeholder="Type item name..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  onKeyDown={handleKeyDown}
+  onFocus={() => {
+    if (
+      search.trim() !== "" &&
+      suggestions.length > 0
+    ) {
+      setShowDropdown(true);
+    }
+  }}
+  onBlur={() => {
+    setTimeout(() => {
+      setShowDropdown(false);
+    }, 200);
+  }}
+/>
 
         <button onClick={() => searchItem(search)}>Search</button>
 
-        <button
-          className="downloadBtn"
-          onClick={downloadPdf}
-        >
+        <button className="downloadBtn" onClick={downloadPdf}>
           Download PDF
         </button>
 
-        {/* DROPDOWN */}
+        {/* DROPDOWN (FIXED CLICK ISSUE) */}
         {showDropdown && suggestions.length > 0 && (
           <ul className="dropdown">
             {suggestions.map((item, idx) => (
               <li
                 key={idx}
-                onClick={() => {
-                  setSearch(item);
-                  setShowDropdown(false);
-                  searchItem(item);
-                }}
+               onMouseDown={() => {
+  setSearch(item);
+  setSuggestions([]);
+  setShowDropdown(false);
+  searchItem(item);
+}}
               >
                 {item}
               </li>
@@ -241,6 +256,23 @@ function ItemLookup() {
                       <td>₹ {formatMoney(r.stockValue)}</td>
                     </tr>
                   ))}
+                  <tr className="total-row">
+  <td><b>Total</b></td>
+
+  <td><b>{format2(totalOpening)}</b></td>
+
+  <td><b>{format2(totalPurchased)}</b></td>
+
+  <td><b>{format2(totalUsed)}</b></td>
+
+  <td><b>{format2(totalClosing)}</b></td>
+
+  <td><b>₹ {formatMoney(totalPurchaseAmount)}</b></td>
+
+  <td><b>₹ {formatMoney(totalUsageAmount)}</b></td>
+
+  <td><b>₹ {formatMoney(totalStockValue)}</b></td>
+</tr>
                 </tbody>
 
               </table>
