@@ -1,250 +1,401 @@
 /* =========================
    PAGE
 ========================= */
+
 .page {
+
   min-height: 100vh;
+
   padding: 20px;
+
   font-family: Arial, sans-serif;
+
   background: #f7f9fc;
+
 }
 
 h2 {
+
   margin-bottom: 20px;
+
   color: #333;
+
 }
 
 /* =========================
    BACK BUTTON
 ========================= */
+
 .backBtn {
+
   margin-bottom: 15px;
+
   padding: 8px 14px;
+
   cursor: pointer;
+
   border: none;
+
   background-color: #1976d2;
+
   color: white;
+
   border-radius: 6px;
+
 }
 
 .backBtn:hover {
+
   background-color: #125ea2;
+
 }
 
 /* =========================
    SEARCH BOX
 ========================= */
+
 .search-box {
+
   margin-bottom: 25px;
+
   position: relative;
+
 }
 
 .search-box input {
+
   padding: 10px;
+
   width: 280px;
+
   margin-right: 10px;
+
   border-radius: 6px;
+
   border: 1px solid #ccc;
+
 }
 
 .search-box button {
+
   padding: 10px 18px;
+
   cursor: pointer;
+
   border: none;
+
   background-color: #28a745;
+
   color: white;
+
   border-radius: 6px;
+
   margin-right: 8px;
+
 }
 
 .search-box button:hover {
+
   background-color: #1e7e34;
+
 }
 
 .downloadBtn {
+
   margin-left: 12px;
+
   background-color: #1976d2;
+
 }
 
 .downloadBtn:hover {
+
   background-color: #125ea2;
+
 }
 
 /* =========================
    DROPDOWN
 ========================= */
+
 .dropdown {
+
   position: absolute;
+
   top: 44px;
+
   left: 0;
+
   width: 280px;
-  background: #ffffff;
+
+  background: white;
+
   border: 1px solid #ccc;
+
   border-radius: 6px;
+
   list-style: none;
+
   padding: 0;
+
   margin: 0;
+
   max-height: 220px;
+
   overflow-y: auto;
+
   z-index: 1000;
 
-  /* 👇 ADD THIS */
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
 }
 
 .dropdown li {
+
   padding: 10px;
+
   cursor: pointer;
+
 }
 
 .dropdown li:hover {
-  background-color: #f0f0f0;
+
+  background: #f0f0f0;
+
 }
 
 /* =========================
    MAIN LAYOUT
 ========================= */
+
 .result-layout {
-  display: flex;
-  gap: 20px;
+
+  width: 100%;
+
+  display: block;
+
 }
 
 /* =========================
-   LEFT CARD
+   SEARCH CARD
 ========================= */
+
 .search-card {
-  width: 32%;
-  min-width: 0;
+
+  width: 100%;
+
   padding: 20px;
+
   border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+
+  background: white;
+
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+
 }
 
 .grid {
+
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+
+  grid-template-columns: repeat(2,1fr);
+
   gap: 12px;
+
 }
 
 .box {
-  background: #f5f7fa;
-  padding: 14px;
-  border-radius: 10px;
-  text-align: center;
+
+  background:#f5f7fa;
+
+  padding:14px;
+
+  border-radius:10px;
+
+  text-align:center;
+
 }
 
 .money {
-  background: #e8f5e9;
+
+  background:#e8f5e9;
+
 }
 
 .total {
-  background: #e3f2fd;
-  grid-column: span 2;
+
+  background:#e3f2fd;
+
+  grid-column:span 2;
+
 }
 
 /* =========================
-   RIGHT TABLE
+   HISTORY TABLE
 ========================= */
+
 .history-table {
-  width: 68%;
-  background: #ffffff;
+
+  width: 100%;
+
+  background: white;
+
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+
   padding: 20px;
-  overflow-x: auto;
+
 }
 
 .history-table table {
+
   width: 100%;
+
   border-collapse: collapse;
-  min-width: 850px;
+
+  table-layout: fixed;
+
 }
 
 .history-table th,
+
 .history-table td {
-  padding: 14px;
+
+  padding: 12px;
+
   text-align: center;
+
+  word-break: break-word;
+
 }
 
-/* =========================
-   TABLE STYLING ✅
-========================= */
+/* TABLE COLORS */
+
 .history-table th {
-  background-color: #1976d2;
+
+  background: #1976d2;
+
   color: white;
+
   font-weight: bold;
-}
 
-.history-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.history-table tr:hover {
-  background-color: #f1f1f1;
 }
 
 .history-table td,
+
 .history-table th {
-  border-bottom: 1px solid #ddd;
-}
 
-@media (max-width: 768px) {
-
-  .page {
-    padding: 12px;
-  }
-
-  .search-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .search-box input {
-    width: 100%;
-    margin-right: 0;
-  }
-
-  .search-box button {
-    width: 100%;
-    margin-right: 0;
-    margin-left: 0;
-  }
-
-  .downloadBtn {
-    margin-left: 0;
-  }
-
-  .dropdown {
-    width: 100%;
-  }
-
-  
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .total {
-    grid-column: span 1;
-  }
-
-  .history-table {
-    padding: 10px;
-  }
-
-  .history-table table {
-    min-width: 600px;
-  }
+  border-bottom:1px solid #ddd;
 
 }
+
+.history-table tr:nth-child(even){
+
+  background:#f9f9f9;
+
+}
+
+.history-table tr:hover{
+
+  background:#f1f1f1;
+
+}
+
+/* TOTAL ROW */
+
 .total-row {
-  background: #ffe8cc;
-  font-weight: bold;
-  position: sticky;
-  bottom: 0;
+
+  background:#ffe8cc;
+
+  font-weight:bold;
+
 }
 
 .total-row td {
-  border-top: 2px solid #ff9800;
+
+  border-top:2px solid #ff9800;
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width:768px){
+
+.page{
+
+padding:12px;
+
+}
+
+.search-box{
+
+display:flex;
+
+flex-direction:column;
+
+gap:10px;
+
+}
+
+.search-box input{
+
+width:100%;
+
+margin-right:0;
+
+}
+
+.search-box button{
+
+width:100%;
+
+margin-right:0;
+
+margin-left:0;
+
+}
+
+.downloadBtn{
+
+margin-left:0;
+
+}
+
+.dropdown{
+
+width:100%;
+
+}
+
+.grid{
+
+grid-template-columns:1fr;
+
+}
+
+.total{
+
+grid-column:span 1;
+
+}
+
+.history-table{
+
+padding:10px;
+
+}
+
+.history-table th,
+
+.history-table td{
+
+padding:8px;
+
+font-size:12px;
+
+}
+
 }
