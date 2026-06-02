@@ -102,18 +102,52 @@ function DailyEntry() {
   };
 
   // SAVE ENTRY
-  const saveEntry = async () => {
+ const saveEntry = async () => {
 
-    if (
-      !date ||
-      !item ||
-      !productId ||
-      !type ||
-      !qty ||
-      (type === "purchase" && !price)
-    ) {
-      toast.warning("Please fill all fields");
-      return;
+  if (
+    !date ||
+    !item ||
+    !productId ||
+    !type ||
+    !qty ||
+    (type === "purchase" && !price)
+  ) {
+
+    toast.warning("Please fill all fields");
+
+    return;
+
+  }
+
+  try {
+
+    // STOCK CHECK FOR USAGE
+    if (type === "usage") {
+
+      const res = await axios.get(
+        `https://balajirestaurant.onrender.com/item?name=${item}`
+      );
+
+      const currentStock =
+        Number(
+          res.data?.closingStock || 0
+        );
+
+      const usedQty =
+        Number(qty);
+
+      if (
+        usedQty > currentStock
+      ) {
+
+        toast.error(
+          `Insufficient Stock. Available: ${currentStock.toFixed(2)}`
+        );
+
+        return;
+
+      }
+
     }
 
     const entry = {
@@ -127,50 +161,70 @@ function DailyEntry() {
       quantity: Number(qty),
 
       price:
+
         type === "purchase"
+
           ? Number(price)
+
           : 0,
 
       entryTime: date
 
     };
 
-    try {
+    // UPDATE
+    if (editId) {
 
-      // UPDATE
-      if (editId) {
+      await axios.put(
+        `${ENTRY_API}/${editId}`,
+        entry
+      );
 
-        await axios.put(`${ENTRY_API}/${editId}`, entry);
-
-        toast.success("Entry updated");
-
-      }
-
-      // SAVE
-      else {
-
-        await axios.post(ENTRY_API, entry);
-
-        toast.success("Entry saved");
-
-      }
-
-      loadEntriesByDate();
-
-      setItem("");
-      setProductId("");
-      setType("");
-      setQty("");
-      setPrice("");
-      setEditId(null);
-
-    } catch (error) {
-
-      toast.error("Error saving entry");
+      toast.success(
+        "Entry updated"
+      );
 
     }
 
-  };
+    // SAVE
+    else {
+
+      await axios.post(
+        ENTRY_API,
+        entry
+      );
+
+      toast.success(
+        "Entry saved"
+      );
+
+    }
+
+    loadEntriesByDate();
+
+    setItem("");
+
+    setProductId("");
+
+    setType("");
+
+    setQty("");
+
+    setPrice("");
+
+    setEditId(null);
+
+  }
+
+  catch (error) {
+
+    toast.error(
+      "Error saving entry"
+    );
+
+  }
+
+};
 
   // DELETE ENTRY
   const deleteEntry = async (id) => {
