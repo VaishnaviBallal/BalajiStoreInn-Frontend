@@ -10,6 +10,7 @@ import "../styles/ItemSearch.css";
 /* =========================
    FORMAT HELPERS
 ========================= */
+
 const toNumber = (v) =>
   v === null || v === undefined ? 0 : Number(String(v).replace(/,/g, ""));
 
@@ -22,268 +23,617 @@ const formatMoney = (v) =>
   });
 
 function ItemLookup() {
+
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+
+  const [suggestions, setSuggestions] =
+    useState([]);
+
+  const [showDropdown, setShowDropdown] =
+    useState(false);
 
   const [data, setData] = useState(null);
-  const [history, setHistory] = useState([]);
 
-  const [allItems, setAllItems] = useState([]);
+  const [history, setHistory] =
+    useState([]);
 
-
-  const SUMMARY_API = "https://balajirestaurant.onrender.com/item";
-  const DAYWISE_API = "https://balajirestaurant.onrender.com/item/daywise";
-  const PDF_API = "https://balajirestaurant.onrender.com/reports/item/daywise/pdf";
+  const [allItems, setAllItems] =
+    useState([]);
 
   /* =========================
-     LOAD ALL ITEMS
+     LOCAL API URL
   ========================= */
+
+ const BASE_URL =
+  "https://balajirestaurant.onrender.com";
+
+  const SUMMARY_API =
+    `${BASE_URL}/item`;
+
+  const DAYWISE_API =
+    `${BASE_URL}/item/daywise`;
+
+  const PDF_API =
+    `${BASE_URL}/reports/item/daywise/pdf`;
+
+  /* =========================
+     LOAD PRODUCTS
+  ========================= */
+
   useEffect(() => {
+
     axios
-      .get("https://balajirestaurant.onrender.com/products")
-      .then((res) => setAllItems(res.data || []))
-      .catch(() => setAllItems([]));
+      .get(`${BASE_URL}/products`)
+      .then((res) => {
+
+        setAllItems(
+          res.data || []
+        );
+
+      })
+
+      .catch(() => {
+
+        setAllItems([]);
+
+      });
+
   }, []);
 
   /* =========================
-     LOCAL FILTER (FIXED)
+     LOCAL SEARCH FILTER
   ========================= */
+
   useEffect(() => {
+
     if (search.trim() === "") {
+
       setSuggestions([]);
+
       setShowDropdown(false);
+
       return;
+
     }
 
-    const filtered = allItems
-      .map((i) => i.name)
-      .filter((name) =>
-        name.toLowerCase().includes(search.toLowerCase())
-      );
+    const filtered =
+      allItems
+
+        .map((i) => i.name)
+
+        .filter((name) =>
+
+          name
+            .toLowerCase()
+            .includes(
+              search.toLowerCase()
+            )
+
+        );
 
     setSuggestions(filtered);
 
-    setShowDropdown(filtered.length > 0);
+    setShowDropdown(
+      filtered.length > 0
+    );
+
   }, [search, allItems]);
 
   /* =========================
-     SEARCH API
+      SEARCH
   ========================= */
-  const searchItem = async (itemName) => {
-    if (!itemName || !itemName.trim()) {
-      toast.warn("Please enter item name");
-      return;
-    }
 
-    try {
-      setShowDropdown(false);
+  const searchItem =
+    async (itemName) => {
 
-      const [summaryRes, historyRes] = await Promise.all([
-        axios.get(`${SUMMARY_API}?name=${itemName.trim()}`),
-        axios.get(`${DAYWISE_API}?name=${itemName.trim()}`),
-      ]);
+      if (!itemName?.trim()) {
 
-      setData(summaryRes.data);
-      setHistory(historyRes.data || []);
+        toast.warn(
+          "Please enter item name"
+        );
 
-      if (!summaryRes.data) {
-        toast.error("Item not found");
+        return;
+
       }
-    } catch (err) {
-      console.error(err);
-      setData(null);
-      setHistory([]);
-      toast.error("Item not found or server error");
-    }
-  };
+
+      try {
+
+        setShowDropdown(false);
+
+        const [
+          summaryRes,
+          historyRes,
+        ] = await Promise.all([
+
+          axios.get(
+            `${SUMMARY_API}?name=${itemName.trim()}`
+          ),
+
+          axios.get(
+            `${DAYWISE_API}?name=${itemName.trim()}`
+          ),
+
+        ]);
+
+        setData(
+          summaryRes.data
+        );
+
+        setHistory(
+          historyRes.data || []
+        );
+
+        if (!summaryRes.data) {
+
+          toast.error(
+            "Item not found"
+          );
+
+        }
+
+      }
+
+      catch (err) {
+
+        console.log(err);
+
+        setData(null);
+
+        setHistory([]);
+
+        toast.error(
+          "Item not found or server error"
+        );
+
+      }
+
+    };
 
   /* =========================
-     ENTER KEY
+     ENTER SEARCH
   ========================= */
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      searchItem(search);
-    }
-  };
+
+  const handleKeyDown =
+    (e) => {
+
+      if (e.key === "Enter") {
+
+        searchItem(search);
+
+      }
+
+    };
 
   /* =========================
-     PDF DOWNLOAD
+     DOWNLOAD PDF
   ========================= */
+
   const downloadPdf = () => {
+
     if (!data) {
-      toast.warn("No data to download");
+
+      toast.warn(
+        "No data"
+      );
+
       return;
+
     }
-    window.open(`${PDF_API}?name=${data.itemName}`, "_blank");
+
+    window.open(
+      `${PDF_API}?name=${data.itemName}`,
+      "_blank"
+    );
+
   };
-  const totalOpening = history.reduce(
-  (sum, r) => sum + toNumber(r.openingStock),
-  0
-);
 
-const totalPurchased = history.reduce(
-  (sum, r) => sum + toNumber(r.purchased),
-  0
-);
+  /* =========================
+      TOTALS
+  ========================= */
 
-const totalUsed = history.reduce(
-  (sum, r) => sum + toNumber(r.used),
-  0
-);
+  const totalOpening =
+    history.length > 0
+      ? toNumber(
+          history[0].openingStock
+        )
+      : 0;
 
-const totalClosing = history.reduce(
-  (sum, r) => sum + toNumber(r.closingStock),
-  0
-);
+  const totalPurchased =
+    history.reduce(
+      (sum, r) =>
+        sum +
+        toNumber(
+          r.purchased
+        ),
+      0
+    );
 
-const totalPurchaseAmount = history.reduce(
-  (sum, r) => sum + toNumber(r.purchaseAmount),
-  0
-);
+  const totalUsed =
+    history.reduce(
+      (sum, r) =>
+        sum +
+        toNumber(
+          r.used
+        ),
+      0
+    );
 
-const totalUsageAmount = history.reduce(
-  (sum, r) => sum + toNumber(r.usageAmount),
-  0
-);
+  const totalClosing =
+    history.length > 0
+      ? toNumber(
+          history[
+            history.length - 1
+          ].closingStock
+        )
+      : 0;
 
-const totalStockValue = history.reduce(
-  (sum, r) => sum + toNumber(r.stockValue),
-  0
-);
+  const totalPurchaseAmount =
+    history.reduce(
+      (sum, r) =>
+        sum +
+        toNumber(
+          r.purchaseAmount
+        ),
+      0
+    );
+
+  const totalUsageAmount =
+    history.reduce(
+      (sum, r) =>
+        sum +
+        toNumber(
+          r.usageAmount
+        ),
+      0
+    );
+
+  const totalStockValue =
+    history.reduce(
+      (sum, r) =>
+        sum +
+        toNumber(
+          r.stockValue
+        ),
+      0
+    );
 
   return (
+
     <div className="page">
 
-      <ToastContainer position="top-right" autoClose={2000} />
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+      />
 
-      <button className="backBtn" onClick={() => navigate("/home")}>
+      <button
+        className="backBtn"
+        onClick={() =>
+          navigate("/home")
+        }
+      >
+
         🏠 Home
+
       </button>
 
-      <h2>Item Lookup</h2>
+      <h2>
+        Item Lookup
+      </h2>
 
-      {/* SEARCH */}
       <div className="search-box">
 
         <input
-  type="text"
-  placeholder="Type item name..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  onKeyDown={handleKeyDown}
-  onFocus={() => {
-    if (
-      search.trim() !== "" &&
-      suggestions.length > 0
-    ) {
-      setShowDropdown(true);
-    }
-  }}
-  onBlur={() => {
-    setTimeout(() => {
-      setShowDropdown(false);
-    }, 200);
-  }}
-/>
 
-        <button onClick={() => searchItem(search)}>Search</button>
+          type="text"
 
-        <button className="downloadBtn" onClick={downloadPdf}>
-          Download PDF
+          placeholder="Type item name..."
+
+          value={search}
+
+          onChange={(e)=>
+            setSearch(
+              e.target.value
+            )
+          }
+
+          onKeyDown={
+            handleKeyDown
+          }
+
+          onFocus={() => {
+
+            if (
+              search.trim() !== ""
+              &&
+              suggestions.length > 0
+            ) {
+
+              setShowDropdown(
+                true
+              );
+
+            }
+
+          }}
+
+          onBlur={() => {
+
+            setTimeout(() => {
+
+              setShowDropdown(
+                false
+              );
+
+            },200);
+
+          }}
+
+        />
+
+        <button
+          onClick={() =>
+            searchItem(search)
+          }
+        >
+
+          Search
+
         </button>
 
-        {/* DROPDOWN (FIXED CLICK ISSUE) */}
-        {showDropdown && suggestions.length > 0 && (
+        <button
+          className="downloadBtn"
+          onClick={downloadPdf}
+        >
+
+          Download PDF
+
+        </button>
+
+        {showDropdown &&
+          suggestions.length > 0 && (
+
           <ul className="dropdown">
-            {suggestions.map((item, idx) => (
-              <li
-                key={idx}
-               onMouseDown={() => {
-  setSearch(item);
-  setSuggestions([]);
-  setShowDropdown(false);
-  searchItem(item);
-}}
-              >
-                {item}
-              </li>
-            ))}
+
+            {suggestions.map(
+              (item, idx) => (
+
+                <li
+
+                  key={idx}
+
+                  onMouseDown={() => {
+
+                    setSearch(item);
+
+                    setSuggestions([]);
+
+                    setShowDropdown(false);
+
+                    searchItem(item);
+
+                  }}
+
+                >
+
+                  {item}
+
+                </li>
+
+              )
+            )}
+
           </ul>
+
         )}
+
       </div>
 
-      {/* RESULTS */}
       {(data || history.length > 0) && (
+
         <div className="result-layout">
 
-          {data && (
-            <div className="search-card">
-              <h2 className="item-title">{data.itemName}</h2>
-            </div>
-          )}
+          <div className="history-table">
 
-          {history.length > 0 && (
-            <div className="history-table">
-              <h2>Daywise Report</h2>
+            <h2>
 
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Opening</th>
-                    <th>Purchased</th>
-                    <th>Used</th>
-                    <th>Closing</th>
-                    <th>Purchase ₹</th>
-                    <th>Usage ₹</th>
-                    <th>Stock Value ₹</th>
+              Daywise Report of
+              {" "}
+              {data?.itemName}
+
+            </h2>
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>Date</th>
+
+                  <th>Opening</th>
+
+                  <th>Purchased</th>
+
+                  <th>Used</th>
+
+                  <th>Closing</th>
+
+                  <th>Purchase ₹</th>
+
+                  <th>Usage ₹</th>
+
+                  <th>Stock Value ₹</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {history.map(
+                  (r, i) => (
+
+                  <tr key={i}>
+
+                    <td>{r.date}</td>
+
+                    <td>
+                      {format2(
+                        r.openingStock
+                      )}
+                    </td>
+
+                    <td>
+                      {format2(
+                        r.purchased
+                      )}
+                    </td>
+
+                    <td>
+                      {format2(
+                        r.used
+                      )}
+                    </td>
+
+                    <td>
+                      {format2(
+                        r.closingStock
+                      )}
+                    </td>
+
+                    <td>
+
+                      ₹ {
+                        formatMoney(
+                          r.purchaseAmount
+                        )
+                      }
+
+                    </td>
+
+                    <td>
+
+                      ₹ {
+                        formatMoney(
+                          r.usageAmount
+                        )
+                      }
+
+                    </td>
+
+                    <td>
+
+                      ₹ {
+                        formatMoney(
+                          r.stockValue
+                        )
+                      }
+
+                    </td>
+
                   </tr>
-                </thead>
 
-                <tbody>
-                  {history.map((r, i) => (
-                    <tr key={i}>
-                      <td>{r.date}</td>
-                      <td>{format2(r.openingStock)}</td>
-                      <td>{format2(r.purchased)}</td>
-                      <td>{format2(r.used)}</td>
-                      <td>{format2(r.closingStock)}</td>
-                      <td>₹ {formatMoney(r.purchaseAmount)}</td>
-                      <td>₹ {formatMoney(r.usageAmount)}</td>
-                      <td>₹ {formatMoney(r.stockValue)}</td>
-                    </tr>
-                  ))}
-                  <tr className="total-row">
-  <td><b>Total</b></td>
+                ))}
 
-  <td><b>{format2(totalOpening)}</b></td>
+                <tr className="total-row">
 
-  <td><b>{format2(totalPurchased)}</b></td>
+                  <td>
+                    <b>Total</b>
+                  </td>
 
-  <td><b>{format2(totalUsed)}</b></td>
+                  <td>
+                    <b>
+                      {format2(
+                        totalOpening
+                      )}
+                    </b>
+                  </td>
 
-  <td><b>{format2(totalClosing)}</b></td>
+                  <td>
+                    <b>
+                      {format2(
+                        totalPurchased
+                      )}
+                    </b>
+                  </td>
 
-  <td><b>₹ {formatMoney(totalPurchaseAmount)}</b></td>
+                  <td>
+                    <b>
+                      {format2(
+                        totalUsed
+                      )}
+                    </b>
+                  </td>
 
-  <td><b>₹ {formatMoney(totalUsageAmount)}</b></td>
+                  <td>
+                    <b>
+                      {format2(
+                        totalClosing
+                      )}
+                    </b>
+                  </td>
 
-  <td><b>₹ {formatMoney(totalStockValue)}</b></td>
-</tr>
-                </tbody>
+                  <td>
 
-              </table>
-            </div>
-          )}
+                    <b>
+
+                      ₹ {
+                        formatMoney(
+                          totalPurchaseAmount
+                        )
+                      }
+
+                    </b>
+
+                  </td>
+
+                  <td>
+
+                    <b>
+
+                      ₹ {
+                        formatMoney(
+                          totalUsageAmount
+                        )
+                      }
+
+                    </b>
+
+                  </td>
+
+                  <td>
+
+                    <b>
+
+                      ₹ {
+                        formatMoney(
+                          totalStockValue
+                        )
+                      }
+
+                    </b>
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
 
         </div>
+
       )}
 
     </div>
+
   );
+
 }
 
 export default ItemLookup;
