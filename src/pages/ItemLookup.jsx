@@ -42,12 +42,15 @@ function ItemLookup() {
   const [allItems, setAllItems] =
     useState([]);
 
+    const [month, setMonth] = useState(
+  new Date().toISOString().slice(0, 7)
+);
   /* =========================
      LOCAL API URL
   ========================= */
 
  const BASE_URL =
-  "https://balajirestaurant.onrender.com";
+  "http://localhost:8080";
 
   const SUMMARY_API =
     `${BASE_URL}/item`;
@@ -143,19 +146,19 @@ function ItemLookup() {
         setShowDropdown(false);
 
         const [
-          summaryRes,
-          historyRes,
-        ] = await Promise.all([
+  summaryRes,
+  historyRes,
+] = await Promise.all([
 
-          axios.get(
-            `${SUMMARY_API}?name=${itemName.trim()}`
-          ),
+  axios.get(
+    `${SUMMARY_API}?name=${encodeURIComponent(itemName.trim())}&month=${month}`
+  ),
 
-          axios.get(
-            `${DAYWISE_API}?name=${itemName.trim()}`
-          ),
+  axios.get(
+    `${DAYWISE_API}?name=${encodeURIComponent(itemName.trim())}&month=${month}`
+  ),
 
-        ]);
+]);
 
         setData(
           summaryRes.data
@@ -212,23 +215,22 @@ function ItemLookup() {
 
   const downloadPdf = () => {
 
-    if (!data) {
+  if (!data) {
+    toast.warn("No data");
+    return;
+  }
 
-      toast.warn(
-        "No data"
-      );
+  const [year, monthNo] = month.split("-");
 
-      return;
+  const start = `${year}-${monthNo}-01`;
 
-    }
+  const end = `${year}-${monthNo}-${new Date(year, monthNo, 0).getDate()}`;
 
-    window.open(
-      `${PDF_API}?name=${data.itemName}`,
-      "_blank"
-    );
-
-  };
-
+  window.open(
+    `${PDF_API}?name=${encodeURIComponent(data.itemName)}&start=${start}&end=${end}`,
+    "_blank"
+  );
+};
   /* =========================
       TOTALS
   ========================= */
@@ -304,10 +306,7 @@ function ItemLookup() {
 
     <div className="page">
 
-      <ToastContainer
-        position="top-right"
-        autoClose={2000}
-      />
+    
 
       <button
         className="backBtn"
@@ -373,6 +372,11 @@ function ItemLookup() {
           }}
 
         />
+        <input
+  type="month"
+  value={month}
+  onChange={(e) => setMonth(e.target.value)}
+/>
 
         <button
           onClick={() =>
@@ -539,87 +543,39 @@ function ItemLookup() {
 
                 ))}
 
-                <tr className="total-row">
+               <tr className="total-row">
+  <td>
+    <b>Closing Balance</b>
+  </td>
 
-                  <td>
-                    <b>Total</b>
-                  </td>
+  <td>
+    <b>{format2(totalOpening)}</b>
+  </td>
 
-                  <td>
-                    <b>
-                      {format2(
-                        totalOpening
-                      )}
-                    </b>
-                  </td>
+  <td>
+    <b>{format2(totalPurchased)}</b>
+  </td>
 
-                  <td>
-                    <b>
-                      {format2(
-                        totalPurchased
-                      )}
-                    </b>
-                  </td>
+  <td>
+    <b>{format2(totalUsed)}</b>
+  </td>
 
-                  <td>
-                    <b>
-                      {format2(
-                        totalUsed
-                      )}
-                    </b>
-                  </td>
+  <td>
+    <b>{format2(totalClosing)}</b>
+  </td>
 
-                  <td>
-                    <b>
-                      {format2(
-                        totalClosing
-                      )}
-                    </b>
-                  </td>
+  <td>
+    <b>₹ {formatMoney(totalPurchaseAmount)}</b>
+  </td>
 
-                  <td>
+  <td>
+    <b>₹ {formatMoney(totalUsageAmount)}</b>
+  </td>
 
-                    <b>
-
-                      ₹ {
-                        formatMoney(
-                          totalPurchaseAmount
-                        )
-                      }
-
-                    </b>
-
-                  </td>
-
-                  <td>
-
-                    <b>
-
-                      ₹ {
-                        formatMoney(
-                          totalUsageAmount
-                        )
-                      }
-
-                    </b>
-
-                  </td>
-
-                  <td>
-
-                    <b>
-
-                      ₹ {
-                        formatMoney(
-                          totalStockValue
-                        )
-                      }
-
-                    </b>
-
-                  </td>
-
-                </tr>
+  <td>
+    <b>₹ {formatMoney(totalStockValue)}</b>
+  </td>
+</tr>
 
               </tbody>
 

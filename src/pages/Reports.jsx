@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/Reports.css";
 
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 /* =========================
@@ -162,13 +162,13 @@ const Reports = () => {
             <tr>
               <th>Date</th>
               <th>Item Name</th>
-              <th>Opening</th>
+              
               <th>Purchased</th>
               <th>Used</th>
-              <th>Closing</th>
+              
               <th>Purchase ₹</th>
               <th>Usage ₹</th>
-              <th>Stock Value ₹</th>
+             
             </tr>
           </thead>
 
@@ -178,30 +178,30 @@ const Reports = () => {
                 <td>{new Date(item.date).toLocaleDateString()}</td>
                 <td>{item.itemName}</td>
 
-                <td>{format2(item.openingStock)}</td>
+               
                 <td>{format2(item.purchased)}</td>
                 <td>{format2(item.used)}</td>
-                <td>{format2(item.closingStock)}</td>
+               
 
                 <td>₹ {formatMoney(item.purchaseAmount)}</td>
                 <td>₹ {formatMoney(item.usageAmount)}</td>
-                <td>₹ {formatMoney(item.stockValue)}</td>
+               
               </tr>
             ))}
 
             {/* ✅ TOTAL ROW */}
             {reports.length > 0 && (
               <tr style={{ fontWeight: "bold", background: "#e3f2fd" }}>
-                <td colSpan="2">TOTAL</td>
+                <td colSpan="2">TOTALS</td>
 
-                <td>{format2(totals.opening)}</td>
+               
                 <td>{format2(totals.purchased)}</td>
                 <td>{format2(totals.used)}</td>
-                <td>{format2(totals.closing)}</td>
+               
 
                 <td>₹ {formatMoney(totals.purchaseAmt)}</td>
                 <td>₹ {formatMoney(totals.usageAmt)}</td>
-                <td>₹ {formatMoney(totals.stockValue)}</td>
+                
               </tr>
             )}
 
@@ -217,7 +217,7 @@ const Reports = () => {
         </table>
       </div>
 
-      <ToastContainer position="top-right" autoClose={2000} />
+     
     </div>
   );
 };

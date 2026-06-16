@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,10 +7,9 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import "../styles/ItemsEntry.css"
+import "../styles/ItemsEntry.css";
 
 function ItemsEntry({ items, setItems }) {
-
   const [itemName, setItemName] = useState("");
   const [unit, setUnit] = useState("");
   const [qty, setQty] = useState("");
@@ -23,7 +21,9 @@ function ItemsEntry({ items, setItems }) {
 
   const navigate = useNavigate();
 
-  const API_URL = "https://balajirestaurant.onrender.com/products";
+  const API_URL = "http://localhost:8080/products";
+
+  const [displayItems,setDisplayItems]=useState([]);
 
   const formatPrice = (value) => {
     return value ? Number(value).toFixed(2) : "0.00";
@@ -31,131 +31,86 @@ function ItemsEntry({ items, setItems }) {
 
   // ENTER KEY SAVE
   useEffect(() => {
-
     const handleKeyDown = (e) => {
-
       if (e.key === "Enter") {
         addItem();
       }
-
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [itemName, unit, qty, price, editId]);
 
   // LOAD ITEMS
-  useEffect(() => {
+ useEffect(() => {
+  axios
+    .get(API_URL)
+    .then((res) => {
+      setItems(res.data);
+      setDisplayItems([]);
+    })
+    .catch((err) => {
+      console.error(err);
+      toast.error("Failed to load items");
+    });
+}, [setItems]);
 
-    axios.get(API_URL)
-      .then(res => setItems(res.data))
-      .catch(err => {
-        console.error(err);
-        toast.error("Failed to load items");
-      });
+  // 🔥 FIXED ADD / UPDATE ITEM
+  const addItem = async () => {
+  if (!itemName.trim() || !unit || qty === "" || price === "") {
+    toast.warning("Please fill all fields");
+    return;
+  }
 
-  }, [setItems]);
-
-  // ADD / UPDATE ITEM
-  const addItem = () => {
-
-    if (itemName.trim() === "" || unit === "" || qty === "" || price === "") {
-      toast.warning("Please fill all fields");
-      return;
-    }
-
-    const trimmedName = itemName.trim().toLowerCase();
-
-    // CHECK DUPLICATE
-    const exists = items.find(
-      (item) =>
-        item.name.trim().toLowerCase() === trimmedName &&
-        item.id !== editId
-    );
-
-    if (exists) {
-      toast.error("Item already exists");
-      return;
-    }
-
-    const itemData = {
-      name: itemName.trim(),
-      unit: unit,
-      quantity: Number(qty),
-      price: Number(price)
-    };
-
-    // UPDATE ITEM
-    if (editId) {
-
-      axios.put(`${API_URL}/${editId}`, itemData)
-        .then(res => {
-
-          const updated = items.map(item =>
-            item.id === editId ? res.data : item
-          );
-
-          setItems(updated);
-
-          toast.success("Item updated successfully");
-
-          resetForm();
-
-        })
-        .catch(err => {
-
-          console.error(err);
-
-          toast.error("Error updating item");
-
-        });
-
-    }
-
-    // ADD ITEM
-    else {
-
-      axios.post(API_URL, itemData)
-        .then(res => {
-
-          setItems([...items, res.data]);
-
-          toast.success("Item added successfully");
-
-          resetForm();
-
-        })
-        .catch(err => {
-
-          console.error(err);
-
-          toast.error("Error adding item");
-
-        });
-
-    }
-
+  const itemData = {
+    name: itemName.trim(),
+    unit,
+    price: Number(price),
+    quantity: Number(qty),
+    openingQuantity: Number(qty),
   };
 
+  try {
+    if (editId) {
+      await axios.put(`${API_URL}/${editId}`, itemData);
+      toast.success("Item updated successfully");
+    } else {
+      await axios.post(API_URL, itemData);
+      toast.success("Item added successfully");
+    }
+
+    const res = await axios.get(API_URL);
+
+    setItems(res.data);
+
+    const updatedItem = res.data.find(
+      (i) =>
+        i.id === editId ||
+        i.name.toLowerCase() === itemData.name.toLowerCase()
+    );
+
+    if (updatedItem) {
+      setDisplayItems([updatedItem]);
+    }
+
+    resetForm();
+  } catch (err) {
+    console.error(err);
+    toast.error("Error saving item");
+  }
+};
   // RESET FORM
   const resetForm = () => {
-
     setItemName("");
     setUnit("");
     setQty("");
     setPrice("");
     setEditId(null);
-
   };
 
-  // DELETE ITEM WITH CONFIRM ALERT
+  // DELETE ITEM
   const deleteItem = (id) => {
-
-    const itemToDelete = items.find(item => item.id === id);
+    const itemToDelete = items.find((item) => item.id === id);
 
     if (!itemToDelete) {
       toast.error("Item not found");
@@ -163,15 +118,14 @@ function ItemsEntry({ items, setItems }) {
     }
 
     confirmAlert({
-
       title: "Confirm Delete",
-
       message: `
 Item Name : ${itemToDelete.name}
 
 Unit : ${itemToDelete.unit}
 
-Opening Qty : ${itemToDelete.quantity}
+Opening Qty : ${itemToDelete.openingQuantity}
+Current Qty : ${itemToDelete.quantity}
 
 Price Per Unit : ₹ ${formatPrice(itemToDelete.price)}
 
@@ -181,82 +135,57 @@ Total Price : ₹ ${formatPrice(
 
 Created Date : ${itemToDelete.createdDate}
       `,
-
       buttons: [
-
         {
           label: "Yes",
-
           onClick: () => {
-
-            axios.delete(`${API_URL}/${id}`)
+            axios
+              .delete(`${API_URL}/${id}`)
               .then(() => {
-
-                setItems(items.filter(item => item.id !== id));
-
+               setItems(items.filter((item) => item.id !== id));
+setDisplayItems(displayItems.filter((item) => item.id !== id));
                 toast.success("Item deleted successfully");
-
               })
-              .catch(err => {
-
+              .catch((err) => {
                 console.error(err);
-
                 toast.error("Error deleting item");
-
               });
-
-          }
+          },
         },
-
-        {
-          label: "No"
-        }
-
-      ]
-
+        { label: "No" },
+      ],
     });
-
   };
 
   // EDIT ITEM
-  const editItem = (item) => {
+ const editItem = (item) => {
+  setItemName(item.name);
+  setUnit(item.unit);
+  setQty(item.quantity);
+  setPrice(Number(item.price).toFixed(2));
+  setEditId(item.id);
 
-    setItemName(item.name);
-    setUnit(item.unit);
-    setQty(item.quantity);
-    setPrice(Number(item.price).toFixed(2));
-    setEditId(item.id);
+  setDisplayItems([item]);
 
-    toast.info("Editing item");
-
-  };
+  toast.info("Editing item");
+};
 
   return (
-
     <div className="page">
-
       <button className="backBtn" onClick={() => navigate("/home")}>
         🏠 Home
       </button>
 
       <h2>Items Entry</h2>
 
-      <ToastContainer
-        position="top-right"
-        autoClose={2000}
-      />
-
       <div className="form-box">
-
         {/* SEARCH BOX */}
         <div style={{ position: "relative" }}>
-
           <input
             type="text"
             placeholder="Enter or search item..."
             value={itemName}
             onChange={(e) => {
-
               const value = e.target.value;
               setItemName(value);
 
@@ -266,13 +195,12 @@ Created Date : ${itemToDelete.createdDate}
                 return;
               }
 
-              const filtered = items.filter(i =>
+              const filtered = items.filter((i) =>
                 i.name.toLowerCase().includes(value.toLowerCase())
               );
 
               setFilteredItems(filtered);
               setShowSuggestions(true);
-
             }}
             onFocus={() => {
               if (itemName) setShowSuggestions(true);
@@ -284,37 +212,30 @@ Created Date : ${itemToDelete.createdDate}
 
           {/* SUGGESTIONS */}
           {showSuggestions && filteredItems.length > 0 && (
-
             <div className="suggestions-box">
-
               {filteredItems.map((i) => (
-
                 <div
                   key={i.id}
                   className="suggestion-item"
                   onClick={() => {
+  setItemName(i.name);
+  setUnit(i.unit);
+  setQty(i.quantity);
+  setPrice(i.price);
+  setEditId(i.id);
 
-                    setItemName(i.name);
-                    setUnit(i.unit);
-                    setQty(i.quantity);
-                    setPrice(i.price);
-                    setEditId(i.id);
+  setDisplayItems([i]);
 
-                    setShowSuggestions(false);
+  setShowSuggestions(false);
 
-                    toast.info("Item already exists. Loaded for update.");
-
-                  }}
+  toast.info("Item loaded for update");
+}}
                 >
                   {i.name}
                 </div>
-
               ))}
-
             </div>
-
           )}
-
         </div>
 
         {/* UNIT */}
@@ -349,21 +270,19 @@ Created Date : ${itemToDelete.createdDate}
         <button className="button" onClick={addItem}>
           {editId ? "Update Item" : "Add Item"}
         </button>
-
       </div>
 
       <h3>Items List</h3>
 
       <div className="table-container">
-
         <table className="table">
-
           <thead>
             <tr>
               <th>Date</th>
               <th>Item</th>
               <th>Unit</th>
               <th>Opening Qty</th>
+              <th>Current Qty</th>
               <th>Price</th>
               <th>Total Price</th>
               <th>Edit</th>
@@ -372,14 +291,12 @@ Created Date : ${itemToDelete.createdDate}
           </thead>
 
           <tbody>
-
-            {items.map((item) => (
-
+           {displayItems.map((item) => (
               <tr key={item.id}>
-
                 <td>{item.createdDate}</td>
                 <td>{item.name}</td>
                 <td>{item.unit}</td>
+                <td>{item.openingQuantity}</td>
                 <td>{item.quantity}</td>
                 <td>{formatPrice(item.price)}</td>
                 <td>{formatPrice(item.quantity * item.price)}</td>
@@ -401,22 +318,14 @@ Created Date : ${itemToDelete.createdDate}
                     Delete
                   </button>
                 </td>
-
               </tr>
-
             ))}
-
           </tbody>
-
         </table>
-
       </div>
-
+ 
     </div>
-
   );
 }
 
 export default ItemsEntry;
-
-
