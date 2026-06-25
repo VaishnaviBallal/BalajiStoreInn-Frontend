@@ -274,7 +274,9 @@ Price : ₹ ${formatPrice(entryToDelete.price)}
           {entries.map(e => (
             <tr key={e.id}>
               <td>{e.entryTime}</td>
-              <td>{e.itemName}</td>
+              <td>
+  {items.find(i => i.id === e.productId)?.name || "N/A"}
+</td>
               <td>{e.type}</td>
               <td>{e.quantity}</td>
               <td>₹ {formatPrice(e.price)}</td>
