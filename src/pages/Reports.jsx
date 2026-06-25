@@ -44,8 +44,9 @@ const Reports = () => {
 
     try {
       const response = await axios.get(
-        `https://balajirestaurant.onrender.com/reports/item?start=${startDate}&end=${endDate}`
-      );
+  `https://balajirestaurant.onrender.com/reports/item/summary?start=${startDate}&end=${endDate}`
+);
+
 
       if (Array.isArray(response.data)) {
         setReports(response.data);
@@ -158,61 +159,45 @@ const Reports = () => {
       <div className="report-table-container">
         <table className="report-table">
 
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Item Name</th>
-              
-              <th>Purchased</th>
-              <th>Used</th>
-              
-              <th>Purchase ₹</th>
-              <th>Usage ₹</th>
-             
-            </tr>
-          </thead>
+         
+<thead>
+  {startDate && endDate && (
+    <tr>
+      <th colSpan="7" style={{ textAlign: "center", fontWeight: "bold" }}>
+        {new Date(startDate).toLocaleDateString("en-IN")} {" - "}
+        {new Date(endDate).toLocaleDateString("en-IN")}
+      </th>
+    </tr>
+  )}
 
-          <tbody>
-            {reports.map((item, index) => (
-              <tr key={index}>
-                <td>{new Date(item.date).toLocaleDateString()}</td>
-                <td>{item.itemName}</td>
+  <tr>
+    <th>Item</th>
+    <th>Purchased</th>
+    <th>Used</th>
+    <th>Purchase ₹</th>
+    <th>Usage ₹</th>
+    <th>Closing Stock</th>
+    <th>Stock Value ₹</th>
+  </tr>
+</thead>
 
-               
-                <td>{format2(item.purchased)}</td>
-                <td>{format2(item.used)}</td>
-               
 
-                <td>₹ {formatMoney(item.purchaseAmount)}</td>
-                <td>₹ {formatMoney(item.usageAmount)}</td>
-               
-              </tr>
-            ))}
+         <tbody>
+  {reports.map((item, index) => (
+    <tr key={index}>
+      <td>{item.itemName}</td>
 
-            {/* ✅ TOTAL ROW */}
-            {reports.length > 0 && (
-              <tr style={{ fontWeight: "bold", background: "#e3f2fd" }}>
-                <td colSpan="2">TOTALS</td>
+      <td>{format2(item.purchased)}</td>
+      <td>{format2(item.used)}</td>
 
-               
-                <td>{format2(totals.purchased)}</td>
-                <td>{format2(totals.used)}</td>
-               
+      <td>₹ {formatMoney(item.purchaseAmount)}</td>
+      <td>₹ {formatMoney(item.usageAmount)}</td>
 
-                <td>₹ {formatMoney(totals.purchaseAmt)}</td>
-                <td>₹ {formatMoney(totals.usageAmt)}</td>
-                
-              </tr>
-            )}
-
-            {reports.length === 0 && (
-              <tr>
-                <td colSpan="9" style={{ textAlign: "center" }}>
-                  No data available
-                </td>
-              </tr>
-            )}
-          </tbody>
+      <td>{format2(item.closingStock)}</td>
+      <td>₹ {formatMoney(item.stockValue)}</td>
+    </tr>
+  ))}
+</tbody>
 
         </table>
       </div>
