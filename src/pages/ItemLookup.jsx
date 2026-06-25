@@ -50,7 +50,7 @@ function ItemLookup() {
   ========================= */
 
  const BASE_URL =
-  "http://localhost:8080";
+  "https://balajirestaurant.onrender.com";
 
   const SUMMARY_API =
     `${BASE_URL}/item`;
