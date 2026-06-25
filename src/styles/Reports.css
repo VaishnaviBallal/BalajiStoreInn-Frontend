@@ -146,7 +146,12 @@ body{
   color:#333;
   font-size:16px;
   text-align:center;
+
+  position: sticky;
+  top: 0;         /* ✅ FIRST ROW sticks */
+  z-index: 3;
 }
+
 
 
 /* =========================
@@ -156,6 +161,12 @@ body{
   padding:10px 12px;
   border-bottom:1px solid #eee;
 }
+.report-table thead tr:nth-child(2) th {
+  position: sticky;
+  top: 40px;   /* adjust based on height */
+  z-index: 2;
+}
+
 
 
 /* =========================
